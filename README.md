@@ -22,7 +22,7 @@ The API key you will have received on [XIVAPI](https://xivapi.com/) will have to
 ![Roster](https://imgur.com/55oIpUO.png)
 On this page, you will have to enter the LodestoneID of every character that you want to track.  
 If you are unsure of what the LodestodeID of the character you want to add is, [search for the character you want to add](https://na.finalfantasyxiv.com/lodestone/character/) and grab all the numbers in the address bar.  
-Example: https://na.finalfantasyxiv.com/lodestone/character/**20723319**/  
+Example: [https://na.finalfantasyxiv.com/lodestone/character/**20723319**/](https://na.finalfantasyxiv.com/lodestone/character/20723319/)  
 Pressing the Black button in the top-left of the page will start the updating process.  
 If you know what you are doing, you can add a Time-Trigger in Google Script to automate the whole process on a time interval.
 

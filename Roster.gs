@@ -104,7 +104,7 @@ function updateFC(freecompany, row) {
   _FCRosterSheet.getRange(row, _FCServerColumn).setValue(freecompany.FreeCompany.Server);
   
   // add Membership Count
-  _FCRosterSheet.getRange(row, _FCMemberCountColumn).setValue(freecompany.FreeCompanyMembers.data.length);
+  _FCRosterSheet.getRange(row, _FCMemberCountColumn).setValue(freecompany.FreeCompanyMembers.length);
   
   // add Ranking (Weekly/Monthly)
   _FCRosterSheet.getRange(row, _FCServerRankColumn).setValue(freecompany.FreeCompany.Ranking.Weekly + " / " + freecompany.FreeCompany.Ranking.Monthly);
@@ -130,8 +130,8 @@ function addNewIDs() {
   }
 
   // retrieve IDs from FC member list, put into parsedIDs
-  for(var i = 0; i < _FCInfo.FreeCompanyMembers.data.length; i++) {
-    parsedIDs[i] = _FCInfo.FreeCompanyMembers.data[i].ID
+  for(var i = 0; i < _FCInfo.FreeCompanyMembers.length; i++) {
+    parsedIDs[i] = _FCInfo.FreeCompanyMembers[i].ID
     parsedIDs[i] = parseInt(parsedIDs[i])
   }
   

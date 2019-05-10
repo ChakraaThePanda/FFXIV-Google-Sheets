@@ -2,7 +2,7 @@
 // * FFXIV Automatic Spreadsheet (v2.0)
 // * Created by Chakraa Arcana @ Leviathan.
 // * Discord: Chakraa#1837
-// * Last Updated: May 8th 2019
+// * Last Updated: May 9th 2019
 // * Purpose: Through the use of https://xivapi.com/, the goal is to display selected information of the
 // * selected characters through their LodestoneID.
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -261,20 +261,36 @@ function fetchIDsFromSheet(){
 
 function fetchCharacterInfos() {
   var pollingError = false;
-  var apikey = _InstructionsSheet.getRange(_InstructionsSheetAPIKeyRow,1).getDisplayValue();
+  
   for(var i = 0; i < _CHID.length; ++i){
-    if(_CHID[i] != "")
-      _CHInfo[i] = JSON.parse(UrlFetchApp.fetch("https://xivapi.com/character/" + _CHID[i] + "?key=" + apikey + "&data=FC,FCM&extended=1").getContentText());
-    else{
-      SpreadsheetApp.getUi().alert("Oh oh, something happened!", 
+    if(_CHID[i] == ""){
+		SpreadsheetApp.getUi().alert("Oh oh, something happened!", 
                                    "Make sure that you don't have data in any cells anywhere else than the rows you have Lodestone IDs in. If you aren't sure, clear everyone and rerun the script :)",
                                   SpreadsheetApp.getUi().ButtonSet.OK);
-      pollingError = true;
-      break;
+		pollingError = true;
+		break;
     }
   }
-  if(!pollingError)
-    updateCharacter();
+  
+  if(!pollingError){
+	var apikey = _InstructionsSheet.getRange(_InstructionsSheetAPIKeyRow,1).getDisplayValue();
+	var temparray;
+	var chunk = 30;
+	for(var i = 0; i < _CHID.length; i += chunk){
+        temparray = _CHID.slice(i,i+chunk);
+		var options = {
+			method : 'POST',
+			payload : JSON.stringify({
+			key : apikey,
+			ids : temparray.toString(),
+			data : 'FC,FCM',
+			extended : 1
+			})
+		};
+		_CHInfo = _CHInfo.concat(JSON.parse(UrlFetchApp.fetch("https://xivapi.com/characters", options).getContentText()));
+	}
+	updateCharacter();
+  }
 }
 
 function updateCharacter(){

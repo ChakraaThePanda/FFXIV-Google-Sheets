@@ -258,16 +258,23 @@ function mergeArrays( aArr, bArr ) {
 
 function isAPIKeyValid()
 {
-	if(_InstructionsSheet.getRange(_InstructionsSheetAPIKeyRow,1).getDisplayValue() != ""){
-		_APIKey = _InstructionsSheet.getRange(_InstructionsSheetAPIKeyRow,1).getDisplayValue();
-		return true;
-	}
-	else{
-		SpreadsheetApp.getUi().alert("Oh oh, something happened!", 
-                                   "Make sure that you have your API Key in the Red Box in the Instructions Page.",
-                                  SpreadsheetApp.getUi().ButtonSet.OK);
-		return false;
-	}
+  if(_InstructionsSheet.getRange(_InstructionsSheetAPIKeyRow,1).getDisplayValue() == ""){
+    SpreadsheetApp.getUi().alert("Oh oh, something happened!", 
+                                 "Make sure that you have your API Key in the Red Box in the Instructions Page.",
+                                 SpreadsheetApp.getUi().ButtonSet.OK);
+    return false;
+    
+  }
+  else if(/\s/g.test(_InstructionsSheet.getRange(_InstructionsSheetAPIKeyRow,1).getDisplayValue())){
+    SpreadsheetApp.getUi().alert("Oh oh, something happened!", 
+                                 "Make sure that your API Key is correctly set in the Red Box of the Instructions Page and doesn't have any spaces, tabs or line returns.",
+                                 SpreadsheetApp.getUi().ButtonSet.OK);
+    return false;
+  }
+  else{
+    _APIKey = _InstructionsSheet.getRange(_InstructionsSheetAPIKeyRow,1).getDisplayValue();
+    return true;
+  }
 }
 
 function fetchIDsFromSheet(){

@@ -80,7 +80,7 @@ function fetchFCInfo() {
   _FCID = _FCRosterSheet.getRange(_FCRow,_CHIDColumn).getDisplayValue();
   // https://xivapi.com/freecompany/<lodestone_id>?data=FCM,FCM&extended=1
   var loading = false, error = false;
-  _FCInfo = JSON.parse(UrlFetchApp.fetch("https://xivapi.com/freecompany/" + _FCID + "?key=" + _InstructionsSheet.getRange(_InstructionsSheetAPIKeyRow,1).getDisplayValue() + "&data=FCM").getContentText());
+  _FCInfo = JSON.parse(UrlFetchApp.fetch("https://xivapi.com/freecompany/" + _FCID + "?key=" + _APIKey + "&data=FCM").getContentText());
 
   if(_FCInfo.Info.FreeCompany.State === _APILoadingStateEnum.LOADING){
       _FCRosterSheet.getRange(FCRow, _FCNameColumn).setValue("Loading...");
@@ -288,9 +288,6 @@ function fetchCharacterInfos() {
 		pollingError = true;
 		break;
     }
-//    else{
-//      UrlFetchApp.fetch("https://xivapi.com/character/" + _CHID[i] + "/update?key=" + _InstructionsSheet.getRange(_InstructionsSheetAPIKeyRow,1).getDisplayValue()).getContentText();
-//    }
   }
   
   if(!pollingError){
@@ -325,6 +322,7 @@ function updateCharacter(){
             }
             _CHSheet[i][1] = "Loading...";
             _CHSheet[i][2] = _CHID[i];
+            UrlFetchApp.fetch("https://xivapi.com/character/" + _CHID[i] + "?key=" + _APIKey).getContentText();    
 			break;
 
 			case _APILoadingStateEnum.NOT_FOUND:
@@ -430,7 +428,7 @@ function fetchUpdateIDsFromSheet(){
     } 
   }
   for(var i = 0, row = _RosterSheetFirstCharacterScannedRow; i < _CHID.length; ++i, ++row){
-    UrlFetchApp.fetch("https://xivapi.com/character/" + _CHID[i] + "/update?key=" + _InstructionsSheet.getRange(_InstructionsSheetAPIKeyRow,1).getDisplayValue()).getContentText();
+    UrlFetchApp.fetch("https://xivapi.com/character/" + _CHID[i] + "/update?key=" + _APIKey).getContentText();
   }  
 }
 

@@ -30,6 +30,7 @@ var _RosterSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Roster'
 	_CHLastUpdatedColumn = 35;
     _ClassOrder = [1,3,32,6,26,33,2,4,29,34,5,31,7,26,35,36,8,9,10,11,12,13,14,15,16,17,18], //The order is a bit weird, but the API is done like that. In the desired order (Tank, Heal, DPS, DoH, DoL). The IDs of the classes.
     _APILoadingStateEnum = {"LOADING":1, "READY":2, "NOT_FOUND":3},
+	_APIKey = "",
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // * Added by Raven Ambree @ Excalibur.
@@ -54,21 +55,23 @@ var _RosterSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Roster'
       
 
 function startFCRosterSheet() {
-  _FCID = _FCRosterSheet.getRange(_FCRow,_CHIDColumn).getDisplayValue()
-  // (Free Company Addon)
-  // If an FC Lodestone ID is present, get all members lodestone ids and list them in the sheet
-  if( _FCID !== "") {
-    
-    fetchFCInfo();
-    addNewIDs();
-  }
-  
-  // If we are using the FCSheet, all the data of the RosterSheet becomes the one from FCRosterSheet
-  _RosterSheet = _FCRosterSheet;
-  _RosterSheetAmountOfRows = _FCRosterSheetAmountOfRows;
-  _RosterSheetFirstCharacterScannedRow = _FCRosterSheetFirstCharacterScannedRow;
-  _AmountOfHeaders = _FCAmountOfHeaders;
-  fetchIDsFromSheet();
+	if(isAPIKeyValid()){
+	  _FCID = _FCRosterSheet.getRange(_FCRow,_CHIDColumn).getDisplayValue()
+	  // (Free Company Addon)
+	  // If an FC Lodestone ID is present, get all members lodestone ids and list them in the sheet
+	  if( _FCID !== "") {
+		
+		fetchFCInfo();
+		addNewIDs();
+	  }
+	  
+	  // If we are using the FCSheet, all the data of the RosterSheet becomes the one from FCRosterSheet
+	  _RosterSheet = _FCRosterSheet;
+	  _RosterSheetAmountOfRows = _FCRosterSheetAmountOfRows;
+	  _RosterSheetFirstCharacterScannedRow = _FCRosterSheetFirstCharacterScannedRow;
+	  _AmountOfHeaders = _FCAmountOfHeaders;
+	  fetchIDsFromSheet();
+	}
 }
 
 
@@ -253,10 +256,25 @@ function mergeArrays( aArr, bArr ) {
 // * Beginning of the Roster Sheet Code by Chakraa Arcana
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+function isAPIKeyValid()
+{
+	if(_InstructionsSheet.getRange(_InstructionsSheetAPIKeyRow,1).getDisplayValue() != ""){
+		_APIKey = _InstructionsSheet.getRange(_InstructionsSheetAPIKeyRow,1).getDisplayValue();
+		return true;
+	}
+	else{
+		SpreadsheetApp.getUi().alert("Oh oh, something happened!", 
+                                   "Make sure that you have your API Key in the Red Box in the Instructions Page.",
+                                  SpreadsheetApp.getUi().ButtonSet.OK);
+		return false;
+	}
+}
 
 function fetchIDsFromSheet(){
-  _CHID = _RosterSheet.getRange(_RosterSheetFirstCharacterScannedRow, _CHIDColumn, _RosterSheetAmountOfRows-_AmountOfHeaders, 1).getDisplayValues();
-  fetchCharacterInfos();
+	if(isAPIKeyValid()){
+		_CHID = _RosterSheet.getRange(_RosterSheetFirstCharacterScannedRow, _CHIDColumn, _RosterSheetAmountOfRows-_AmountOfHeaders, 1).getDisplayValues();
+		fetchCharacterInfos();
+	}
 }
 
 function fetchCharacterInfos() {
@@ -270,6 +288,9 @@ function fetchCharacterInfos() {
 		pollingError = true;
 		break;
     }
+//    else{
+//      UrlFetchApp.fetch("https://xivapi.com/character/" + _CHID[i] + "/update?key=" + _InstructionsSheet.getRange(_InstructionsSheetAPIKeyRow,1).getDisplayValue()).getContentText();
+//    }
   }
   
   if(!pollingError){

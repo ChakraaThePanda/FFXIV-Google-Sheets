@@ -31,6 +31,8 @@ var _RosterSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Roster'
     _ClassOrder = [1,3,32,6,26,33,2,4,29,34,5,31,7,26,35,36,8,9,10,11,12,13,14,15,16,17,18], //The order is a bit weird, but the API is done like that. In the desired order (Tank, Heal, DPS, DoH, DoL). The IDs of the classes.
     _APILoadingStateEnum = {"LOADING":1, "READY":2, "NOT_FOUND":3},
 	_APIKey = "",
+    _DataCenters = JSON.parse(UrlFetchApp.fetch("https://xivapi.com/servers/dc/").getContentText()),
+    _Servers = {},
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // * Added by Raven Ambree @ Excalibur.
@@ -56,6 +58,7 @@ var _RosterSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Roster'
 
 function startFCRosterSheet() {
 	if(isAPIKeyValid()){
+      buildServerList();
 	  _FCID = _FCRosterSheet.getRange(_FCRow,_CHIDColumn).getDisplayValue()
 	  // (Free Company Addon)
 	  // If an FC Lodestone ID is present, get all members lodestone ids and list them in the sheet
@@ -104,7 +107,7 @@ function updateFC(freecompany, row) {
   _FCRosterSheet.getRange(row, _FCNameColumn).setValue("=HYPERLINK(\"https://na.finalfantasyxiv.com/lodestone/freecompany/" + freecompany.FreeCompany.ID.replace('i','') + "\", \"" + freecompany.FreeCompany.Name + " «" + freecompany.FreeCompany.Tag + "» " + "\")");
   
   // add server FC is from
-  _FCRosterSheet.getRange(row, _FCServerColumn).setValue(freecompany.FreeCompany.Server);
+  _FCRosterSheet.getRange(row, _FCServerColumn).setValue(_Servers[freecompany.FreeCompany.Server] + ' / ' + freecompany.FreeCompany.Server);
   
   // add Membership Count
   _FCRosterSheet.getRange(row, _FCMemberCountColumn).setValue(freecompany.FreeCompanyMembers.length);
@@ -256,6 +259,14 @@ function mergeArrays( aArr, bArr ) {
 // * Beginning of the Roster Sheet Code by Chakraa Arcana
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+function fetchIDsFromSheet(){
+	if(isAPIKeyValid()){
+		_CHID = _RosterSheet.getRange(_RosterSheetFirstCharacterScannedRow, _CHIDColumn, _RosterSheetAmountOfRows-_AmountOfHeaders, 1).getDisplayValues();
+		buildServerList();
+		fetchCharacterInfos();
+	}
+}
+
 function isAPIKeyValid()
 {
   if(_InstructionsSheet.getRange(_InstructionsSheetAPIKeyRow,1).getDisplayValue() == ""){
@@ -277,11 +288,12 @@ function isAPIKeyValid()
   }
 }
 
-function fetchIDsFromSheet(){
-	if(isAPIKeyValid()){
-		_CHID = _RosterSheet.getRange(_RosterSheetFirstCharacterScannedRow, _CHIDColumn, _RosterSheetAmountOfRows-_AmountOfHeaders, 1).getDisplayValues();
-		fetchCharacterInfos();
-	}
+function buildServerList(){
+  Object.keys(_DataCenters).forEach(function (dc) {
+    _DataCenters[dc].forEach(function (server) {
+      _Servers[server] = dc;
+    });
+  }); 
 }
 
 function fetchCharacterInfos() {
@@ -343,8 +355,8 @@ function updateCharacter(){
 			case _APILoadingStateEnum.READY:
 			_CHSheet[i][0] = "=HYPERLINK(\"" + _CHInfo[i].Character.Portrait + "\", IMAGE(\""+ _CHInfo[i].Character.Avatar + "\"))";
 			_CHSheet[i][1] = "=HYPERLINK(\"https://na.finalfantasyxiv.com/lodestone/character/" + _CHInfo[i].Character.ID + "\", \"" + _CHInfo[i].Character.Name + "\")";
-            _CHSheet[i][2] = _CHInfo[i].Character.ID
-			_CHSheet[i][3] = _CHInfo[i].Character.Server;
+            _CHSheet[i][2] = _CHInfo[i].Character.ID;
+			_CHSheet[i][3] = _Servers[_CHInfo[i].Character.Server] + ' / ' + _CHInfo[i].Character.Server;
 			_CHSheet[i][4] = updateFreeCompany(_CHInfo[i])[0];
 			_CHSheet[i][5] = updateFreeCompany(_CHInfo[i])[1];
 			_CHSheet[i][6] = updateCurrentClass(_CHInfo[i]);

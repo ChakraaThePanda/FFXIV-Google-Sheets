@@ -417,23 +417,25 @@ function updateClassJobsAndTime(character){
   var classJobs = character.Character.ClassJobs;
   var keys  = Object.keys(classJobs);
   var AllClasses = [];
-  for(var j = 0; j < keys.length; ++j){
+  for(var j = 0; j < _ClassOrder.length; ++j){
     //Add Class Levels
-    for(var i = 0; i < keys.length; ++i){
-      if(classJobs[keys[i]].Class.ID === _ClassOrder[j]){
-        if(classJobs[keys[i]].Level === 0){ //Put "-" instead of 0 when the person has not yet unlock his class.
-          AllClasses[j] = "-";
+    AllClasses[j] = "-";
+    for(var i = 0; i < _ClassOrder.length; ++i){
+      if(classJobs[keys[i]] != null)
+        if(classJobs[keys[i]].Class.ID === _ClassOrder[j]){
+          if(classJobs[keys[i]].Level === 0){ //Put "-" instead of 0 when the person has not yet unlock his class.
+            AllClasses[j] = "-";
+          }
+          else if(classJobs[keys[i]].ExpLevelTogo === 0){ //If level max, we just register it.
+            AllClasses[j] = classJobs[keys[i]].Level;
+          }
+          else{ //We put the percentage of non-max levels, and we put it smaller than the written level.
+            var level = classJobs[keys[i]].Level;
+            var xpPercent = "\n(" + Math.round(classJobs[keys[i]].ExpLevel / classJobs[keys[i]].ExpLevelMax * 100) + "%)";
+            AllClasses[j] = level + xpPercent;   
+          }
+          break;
         }
-        else if(classJobs[keys[i]].ExpLevelTogo === 0){ //If level max, we just register it.
-          AllClasses[j] = classJobs[keys[i]].Level;
-        }
-        else{ //We put the percentage of non-max levels, and we put it smaller than the written level.
-          var level = classJobs[keys[i]].Level;
-          var xpPercent = "\n(" + Math.round(classJobs[keys[i]].ExpLevel / classJobs[keys[i]].ExpLevelMax * 100) + "%)";
-          AllClasses[j] = level + xpPercent;   
-        }
-        break;
-      }
     }
   }
   return AllClasses;

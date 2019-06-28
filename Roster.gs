@@ -26,9 +26,9 @@ var _RosterSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Roster'
     _CHInfo = [], 
 	_CHSheet = [],
     _CHIDColumn = 3,
-    _CHFCJoinDate = 37,	
-	_CHLastUpdatedColumn = 35;
-    _ClassOrder = [1,3,32,6,26,33,2,4,29,34,5,31,7,26,35,36,8,9,10,11,12,13,14,15,16,17,18], //The order is a bit weird, but the API is done like that. In the desired order (Tank, Heal, DPS, DoH, DoL). The IDs of the classes.
+    _CHFCJoinDate = 39,	
+	_CHLastUpdatedColumn = 37,
+    _ClassOrder = [1,3,32,37,6,26,33,2,4,29,34,5,31,38,7,26,35,36,8,9,10,11,12,13,14,15,16,17,18], //The order is a bit weird, but the API is done like that. In the desired order (Tank, Heal, DPS, DoH, DoL). The IDs of the classes.
     _APILoadingStateEnum = {"LOADING":1, "READY":2, "NOT_FOUND":3},
 	_APIKey = "",
     _DataCenters = JSON.parse(UrlFetchApp.fetch("https://xivapi.com/servers/dc/").getContentText()),
@@ -53,7 +53,7 @@ var _RosterSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Roster'
     _FCServerColumn = 4,
     _FCMemberCountColumn = 5,
     _FCServerRankColumn = 6,
-    _FCTimeEquation = 36;
+    _FCTimeEquation = 38;
       
 
 function startFCRosterSheet() {

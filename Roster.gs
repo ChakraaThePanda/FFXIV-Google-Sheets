@@ -101,7 +101,7 @@ function fetchFCInfo() {
 function updateFC(freecompany, row) {
   
    // add FC Logo
-   _FCRosterSheet.getRange(row, _FCAvatarColumn).setValue("=IMAGE(\"https://xivapi.com/fc/" + freecompany.FreeCompany.ID + ".png\",2)");
+   _FCRosterSheet.getRange(row, _FCAvatarColumn).setValue("=IMAGE(\"https://xivapi.com/freecompany/" + freecompany.FreeCompany.ID + "/icon\",2)");
   
   // add FC Name
   _FCRosterSheet.getRange(row, _FCNameColumn).setValue("=HYPERLINK(\"https://na.finalfantasyxiv.com/lodestone/freecompany/" + freecompany.FreeCompany.ID.replace('i','') + "\", \"" + freecompany.FreeCompany.Name + " «" + freecompany.FreeCompany.Tag + "» " + "\")");

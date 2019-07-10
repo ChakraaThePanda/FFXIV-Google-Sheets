@@ -60,10 +60,10 @@ function startFCRosterSheet() {
 	if(isAPIKeyValid()){
       buildServerList();
 	  _FCID = _FCRosterSheet.getRange(_FCRow,_CHIDColumn).getDisplayValue()
+      
 	  // (Free Company Addon)
 	  // If an FC Lodestone ID is present, get all members lodestone ids and list them in the sheet
 	  if( _FCID !== "") {
-		
 		fetchFCInfo();
 		addNewIDs();
 	  }
@@ -443,14 +443,20 @@ function updateClassJobsAndTime(character){
 
 // Function to force updates every 6 hours. Called by TimeBased Triggers in Google Sheets.
 function fetchUpdateIDsFromSheet(){
-  for(var i = 0, j = _RosterSheetFirstCharacterScannedRow; i < _RosterSheetAmountOfRows; ++i, ++j){
-    if(_RosterSheet.getRange(j,_CHIDColumn).getDisplayValue() !== ""){
-      _CHID[i] = _RosterSheet.getRange(j, _CHIDColumn).getDisplayValue();
-    } 
-  }
-  for(var i = 0, row = _RosterSheetFirstCharacterScannedRow; i < _CHID.length; ++i, ++row){
-    UrlFetchApp.fetch("https://xivapi.com/character/" + _CHID[i] + "/update?key=" + _APIKey).getContentText();
-  }  
+	if(isAPIKeyValid()){
+		var CHSheetID,
+		FCID = _FCRosterSheet.getRange(_FCRow, _FCIDColumn).getDisplayValue();
+		
+	  for(var i = 0, j = _RosterSheetFirstCharacterScannedRow; i < _RosterSheetAmountOfRows; ++i, ++j){
+		  CHSheetID = _RosterSheet.getRange(j,_CHIDColumn).getDisplayValue();
+		if(CHSheetID !== "")
+		  _CHID[i] = CHSheetID;
+	  }
+	  for(var i = 0, row = _RosterSheetFirstCharacterScannedRow; i < _CHID.length; ++i, ++row)
+		UrlFetchApp.fetch("https://xivapi.com/character/" + _CHID[i] + "/update?key=" + _APIKey).getContentText();
+	  if(FCID != "")
+		UrlFetchApp.fetch("https://xivapi.com/freecompany/" + FCID + "/update?key=" + _APIKey).getContentText();
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////

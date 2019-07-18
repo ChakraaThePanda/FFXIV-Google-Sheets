@@ -33,6 +33,7 @@ var _RosterSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Roster'
 	_APIKey = "",
     _DataCenters = JSON.parse(UrlFetchApp.fetch("https://xivapi.com/servers/dc/").getContentText()),
     _Servers = {},
+    _AlarmWrongilvl = false;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // * Added by Raven Ambree @ Excalibur.
@@ -366,6 +367,10 @@ function updateCharacter(){
 		}
   }
   _RosterSheet.getRange(_RosterSheetFirstCharacterScannedRow, 1, _RosterSheetAmountOfRows-_AmountOfHeaders, _CHLastUpdatedColumn).setValues(_CHSheet);
+  if(_AlarmWrongilvl)
+    SpreadsheetApp.getUi().alert("Oh oh, something happened!", 
+                                   "It looks like some of the equipment one of the characters is wearing hasn't been added to the database yet." + '\n' + "The shown equipped ilvl might be wrong, but the rest of the sheet is as normal." + '\n' +  "It should be fixed automatically shortly.",
+                                  SpreadsheetApp.getUi().ButtonSet.OK);    
 }
 
 function updateFreeCompany(character){
@@ -397,7 +402,9 @@ function updateCurrentClass(character){
   for(var amountofslots = 0; amountofslots < keys.length; ++amountofslots){
     if(keys[amountofslots].toString() !== "SoulCrystal" && keys[amountofslots].toString() !== "MainHand") //Ignore SoulCrystal dans total
       if(gear[keys[amountofslots]].Item !== null)
-       ilvl += gear[keys[amountofslots]].Item.LevelItem;
+        ilvl += gear[keys[amountofslots]].Item.LevelItem;
+      else
+        _AlarmWrongilvl = true;
     if(keys[amountofslots].toString() == "MainHand")
       mainHandIndex = amountofslots;
     if(keys[amountofslots].toString() == "OffHand")
@@ -405,7 +412,7 @@ function updateCurrentClass(character){
     if(keys[amountofslots].toString() == "SoulCrystal")
       soulcrystal = true;
   }
-
+  
   //If you are a class wearing an offhand, you count the main hand once. If PLD or DoH only has its main hand equipped, will count twice.
   ilvl += (offhand ? gear[keys[mainHandIndex]].Item.LevelItem : gear[keys[mainHandIndex]].Item.LevelItem * 2);
 

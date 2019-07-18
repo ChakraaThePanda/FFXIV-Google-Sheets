@@ -1,4 +1,4 @@
-# FFXIV Automatic Spreadsheet (v2.0)
+# FFXIV Automatic Spreadsheet
 **Created by**:  
 Chakraa Arcana @ Leviathan.  
 Discord: Chakraa#1837

@@ -396,6 +396,7 @@ function updateCurrentClass(character){
       soulcrystal = false;
   for(var amountofslots = 0; amountofslots < keys.length; ++amountofslots){
     if(keys[amountofslots].toString() !== "SoulCrystal" && keys[amountofslots].toString() !== "MainHand") //Ignore SoulCrystal dans total
+      if(gear[keys[amountofslots]].Item !== null)
        ilvl += gear[keys[amountofslots]].Item.LevelItem;
     if(keys[amountofslots].toString() == "MainHand")
       mainHandIndex = amountofslots;

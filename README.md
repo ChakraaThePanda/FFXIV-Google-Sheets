@@ -11,6 +11,10 @@ Through the use of [XIVAPI](https://xivapi.com/), the goal is to display selecte
 selected characters through their LodestoneID in a Google Sheets Project.  
 The Sheets Project will be made available to copy by anyone and be used to manage their own team, FC, Linkshell, etc.
 
+**Where to Start**:
+You can copy the blank template located below, and add your informations after following the little tutorial.
+https://docs.google.com/spreadsheets/d/1ogSmumtF4Ml83k1ddc2UEGgGu-VkHlqK9jTftSdqYnk/
+
 ## The Sheets
 
 ### Instructions

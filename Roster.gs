@@ -311,7 +311,7 @@ function fetchCharacterInfos() {
 			payload : JSON.stringify({
 			key : apikey,
 			ids : temparray.toString(),
-			data : 'FC,FCM',
+			data : 'FC',
 			extended : 1
 			})
 		};
@@ -329,9 +329,8 @@ function updateCharacter(){
       _CHSheet[i][1] = "=HYPERLINK(\"https://na.finalfantasyxiv.com/lodestone/character/" + _CHInfo[i].Character.ID + "\", \"" + _CHInfo[i].Character.Name + "\")";
       _CHSheet[i][2] = _CHInfo[i].Character.ID;
       _CHSheet[i][3] = _CHInfo[i].Character.Server;
-      FCInfo = updateFreeCompany(_CHInfo[i]);
-      _CHSheet[i][4] = FCInfo[0];
-      _CHSheet[i][5] = FCInfo[1];
+      _CHSheet[i][4] = updateFreeCompany(_CHInfo[i]);
+      _CHSheet[i][5] = "";
       _CHSheet[i][6] = updateCurrentClass(_CHInfo[i]);
       _CHSheet[i][7] = new Date(_CHInfo[i].Character.ParseDate * 1000);
       _CHSheet[i].splice.apply(_CHSheet[i],[7,0].concat(updateClassJobsAndTime(_CHInfo[i])));
@@ -356,18 +355,13 @@ function updateFreeCompany(character){
   if(character.Character.FreeCompanyId !== null){
     if(character.FreeCompany !== null){
       FCName = "=HYPERLINK(\"https://na.finalfantasyxiv.com/lodestone/freecompany/" + character.FreeCompany.ID.replace('i','') + "\", \"" + character.FreeCompany.Name + " «" + character.FreeCompany.Tag + "» " + "\")";
-	  for(var i = 0; i < character.FreeCompanyMembers.length; ++i)
-        if(character.Character.Name == character.FreeCompanyMembers[i].Name){
-			FCRank = character.FreeCompanyMembers[i].Rank;
-			break;
-		}
 	}
 	else
 	{
       FCName = "Loading...";
 	}
   }
-  return [FCName, FCRank];
+  return FCName;
 }
 
 function updateCurrentClass(character){

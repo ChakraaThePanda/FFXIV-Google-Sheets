@@ -3,7 +3,7 @@
 // * Created by Chakraa Arcana @ Leviathan.
 // * Discord: Chakraa#1837
 // * Created on: Jan 25th 2019
-// * Purpose: Through the use of https://xivapi.com/, the goal is to display selected information of the
+// * Purpose: Through the use of https://staging.xivapi.com/, the goal is to display selected information of the
 // * selected characters through their LodestoneID.
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -112,61 +112,94 @@ function updateFC(freecompany, row) {
 
 }
 
+
+
 // Checks for existing IDs. If a Free Company Member has already been added to the sheet, don't include it in new array.
 function addNewIDs() {
   var sheetIDs = [],
       parsedIDs = [],
+      sorted2DIDs = [],
       data = [];
   
-  //new code
-  // pull all the data at once. This puts it into a 2D array 1 across, and a number of rows down. 
-  if (_FCRosterSheetAmountOfRows > 0) {
-    var sheet2DIDs = _FCRosterSheet.getRange(_FCRosterSheetFirstCharacterScannedRow, _CHIDColumn, _FCRosterSheetAmountOfRows,1).getDisplayValues()
-
-    for (var i = 0; i < sheet2DIDs.length; i++) {
-      sheetIDs[i] = parseInt(sheet2DIDs[i][0])
-      if (isNaN(sheetIDs[i])) { sheetIDs[i] = "" }
-        
-    }
-  }
-
   // retrieve IDs from FC member list, put into parsedIDs
   for(var i = 0; i < _FCInfo.FreeCompanyMembers.length; i++) {
     parsedIDs[i] = _FCInfo.FreeCompanyMembers[i].ID
-    parsedIDs[i] = parseInt(parsedIDs[i])
     
+    var arr = [];
+    
+    arr[0] = _FCInfo.FreeCompanyMembers[i].ID
+    arr[1] = _FCInfo.FreeCompanyMembers[i].Rank
+    sorted2DIDs[i] = arr
   }
-  
-  // filter parsed IDs with sheet IDs to retrieve new IDs to the sheet
-  var newIDs = parsedIDs.filter( function(id) { return this.indexOf( id ) < 0; }, sheetIDs);
-  
-  var timeRows = sheetIDs.length
+  // create a sorted list of parsed IDs
+  sorted2DIDs.sort(sortNumber);
   
   
-  // new IDs found. Add IDs where they fit, and give 'em times.
-  // If not, go update IDs
-  if (newIDs.length > 0) {
+  
+  // pull all the data from the sheet at once. This puts it into a 2D array 4 across, and a number of rows down. 
+  if (_FCRosterSheetAmountOfRows > 0) {
+    var sheet2DIDs = _FCRosterSheet.getRange(_FCRosterSheetFirstCharacterScannedRow, _CHIDColumn, _FCRosterSheetAmountOfRows,4).getDisplayValues()
+    for (var i = 0; i < sheet2DIDs.length; i++) {
+      var id = parseInt(sheet2DIDs[i][0])
+      sheetIDs[i] = id
+      if (isNaN(sheetIDs[i])) {
+        sheetIDs[i] = ""
+      }
+    }
+  }
+
+    var newIDs = parsedIDs.filter( function(id) { return this.indexOf( id ) < 0; }, sheetIDs);
     data = mergeArrays(newIDs, sheetIDs)
-    
+    var timeRows = sheetIDs.length
     timeRows = data.length
+
+
 
     
     // Map the data into a 2D array for bulk placement (thank you, stackoverflow)
     // https://stackoverflow.com/questions/53090460/1d-array-to-fill-a-spreadsheet-column
-
+    
     var newData = data.map(function (elem) { return [elem]; });
-    var range = _FCRosterSheet.getRange(_FCRosterSheetFirstCharacterScannedRow ,_CHIDColumn, newData.length,1);
-    range.setValues(newData);
+    if (newData.length > 0) {  
+      var range = _FCRosterSheet.getRange(_FCRosterSheetFirstCharacterScannedRow ,_CHIDColumn, newData.length,1);
+      range.setValues(newData);
+    }
   
-
+  // If FC member is already on sheet, get their parsed rank and update it.
+  for (i = 0; i < data.length; i++){
+    newData[i][0] = binarySearch(sorted2DIDs, data[i], 0, sorted2DIDs.length-1)
+  }  
+  var rankData = newData.map(function (elem) { return [elem]; });
+  var range = _FCRosterSheet.getRange(_FCRosterSheetFirstCharacterScannedRow ,_FCServerRankColumn, rankData.length,1);
+    range.setValues(rankData);
+  
+    // update the roster with the new amount of rows.
+    _FCRosterSheetAmountOfRows = _FCRosterSheet.getLastRow()
+  
+    // add times and equations for all empty time and equation cells.
+    updateDates(_FCRosterSheetAmountOfRows - _FCAmountOfHeaders);
+    updateTimeEquations(_FCRosterSheetAmountOfRows - _FCAmountOfHeaders);
   }
-  
-  // update the roster with the new amount of rows.
-  _FCRosterSheetAmountOfRows = _FCRosterSheet.getLastRow()
-  
-  // add times and equations for all empty time and equation cells.
-  updateDates(_FCRosterSheetAmountOfRows - _FCAmountOfHeaders);
-  updateTimeEquations(_FCRosterSheetAmountOfRows - _FCAmountOfHeaders);
+
+
+
+// search through a sorted array for a key. Used recursively.
+function binarySearch(arr, key, low, high) {
+  var mid = parseInt((high + low) / 2);
+
+  if (arr[mid][0] == key) {
+    return arr[mid][1]
+  } else if (low >= high) {
+    return ""
+  } else if (arr[mid][0] > key) {
+    return binarySearch(arr, key, low, mid-1)
+  } else {
+    return binarySearch(arr, key, mid+1, high) 
+  }
+}
+
+function sortNumber(a, b) {
+  return a[0] - b[0];
 }
 
 // fills in blank rows with the current date
@@ -227,9 +260,12 @@ function mergeArrays( aArr, bArr ) {
   var row = 0,
       bLen = bArr.length,
       aLen = aArr.length;
-  
   var result = new Array();
-
+  
+  if (aLen == 0) {
+    return bArr
+  }
+  
   for (var i = 0; i < (aLen); i++) {
 
     // find first vacant row to throw the ID in

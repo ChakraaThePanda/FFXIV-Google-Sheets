@@ -31,8 +31,6 @@ var _RosterSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Roster'
     _ClassOrder = [1,3,32,37,6,26,33,2,4,29,34,5,31,38,7,26,35,36,8,9,10,11,12,13,14,15,16,17,18], //The order is a bit weird, but the API is done like that. In the desired order (Tank, Heal, DPS, DoH, DoL). The IDs of the classes.
     _APILoadingStateEnum = {"LOADING":1, "READY":2, "NOT_FOUND":3},
 	_APIKey = "",
-    _DataCenters = JSON.parse(UrlFetchApp.fetch("https://xivapi.com/servers/dc/").getContentText()),
-    _Servers = {},
     _AlarmWrongilvl = false;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -263,7 +261,6 @@ function mergeArrays( aArr, bArr ) {
 function fetchIDsFromSheet(){
 	if(isAPIKeyValid()){
 		_CHID = _RosterSheet.getRange(_RosterSheetFirstCharacterScannedRow, _CHIDColumn, _RosterSheetAmountOfRows-_AmountOfHeaders, 1).getDisplayValues();
-		buildServerList();
 		fetchCharacterInfos();
 	}
 }
@@ -289,14 +286,6 @@ function isAPIKeyValid()
   }
 }
 
-function buildServerList(){
-  Object.keys(_DataCenters).forEach(function (dc) {
-    _DataCenters[dc].forEach(function (server) {
-      _Servers[server] = dc;
-    });
-  }); 
-}
-
 function fetchCharacterInfos() {
   var pollingError = false;
   
@@ -313,10 +302,11 @@ function fetchCharacterInfos() {
   if(!pollingError){
 	var apikey = _InstructionsSheet.getRange(_InstructionsSheetAPIKeyRow,1).getDisplayValue();
 	var temparray;
-	var chunk = 30;
+	var chunk = 1;
 	for(var i = 0; i < _CHID.length; i += chunk){
         temparray = _CHID.slice(i,i+chunk);
 		var options = {
+            muteHttpExceptions : true,
 			method : 'POST',
 			payload : JSON.stringify({
 			key : apikey,
@@ -334,37 +324,25 @@ function fetchCharacterInfos() {
 function updateCharacter(){
   for(var i = 0;i < _CHID.length;++i){
       _CHSheet[i] = [];
-		switch(_CHInfo[i].Info.Character.State)
-		{
-			case _APILoadingStateEnum.LOADING:
-			for(var j = 0;j < _CHLastUpdatedColumn;++j){
-              _CHSheet[i].push("");
-            }
-            _CHSheet[i][1] = "Loading...";
-            _CHSheet[i][2] = _CHID[i];
-            UrlFetchApp.fetch("https://xivapi.com/character/" + _CHID[i] + "?key=" + _APIKey).getContentText();    
-			break;
-
-			case _APILoadingStateEnum.NOT_FOUND:
-            for(var j = 0;j < _CHLastUpdatedColumn;++j){
-              _CHSheet[i].push("");
-            }
-            _CHSheet[i][1] = "Not Found";
-            _CHSheet[i][2] = _CHID[i];
-			break;
-
-			case _APILoadingStateEnum.READY:
-			_CHSheet[i][0] = "=HYPERLINK(\"" + _CHInfo[i].Character.Portrait + "\", IMAGE(\""+ _CHInfo[i].Character.Avatar + "\"))";
-			_CHSheet[i][1] = "=HYPERLINK(\"https://na.finalfantasyxiv.com/lodestone/character/" + _CHInfo[i].Character.ID + "\", \"" + _CHInfo[i].Character.Name + "\")";
-            _CHSheet[i][2] = _CHInfo[i].Character.ID;
-			_CHSheet[i][3] = _Servers[_CHInfo[i].Character.Server] + ' / ' + _CHInfo[i].Character.Server;
-			_CHSheet[i][4] = updateFreeCompany(_CHInfo[i])[0];
-			_CHSheet[i][5] = updateFreeCompany(_CHInfo[i])[1];
-			_CHSheet[i][6] = updateCurrentClass(_CHInfo[i]);
-			_CHSheet[i][7] = new Date(_CHInfo[i].Character.ParseDate * 1000);
-            _CHSheet[i].splice.apply(_CHSheet[i],[7,0].concat(updateClassJobsAndTime(_CHInfo[i])));
-			break;
-		}
+    if(_CHInfo[i].hasOwnProperty('Character')){
+      _CHSheet[i][0] = "=HYPERLINK(\"" + _CHInfo[i].Character.Portrait + "\", IMAGE(\""+ _CHInfo[i].Character.Avatar + "\"))";
+      _CHSheet[i][1] = "=HYPERLINK(\"https://na.finalfantasyxiv.com/lodestone/character/" + _CHInfo[i].Character.ID + "\", \"" + _CHInfo[i].Character.Name + "\")";
+      _CHSheet[i][2] = _CHInfo[i].Character.ID;
+      _CHSheet[i][3] = _CHInfo[i].Character.Server;
+      FCInfo = updateFreeCompany(_CHInfo[i]);
+      _CHSheet[i][4] = FCInfo[0];
+      _CHSheet[i][5] = FCInfo[1];
+      _CHSheet[i][6] = updateCurrentClass(_CHInfo[i]);
+      _CHSheet[i][7] = new Date(_CHInfo[i].Character.ParseDate * 1000);
+      _CHSheet[i].splice.apply(_CHSheet[i],[7,0].concat(updateClassJobsAndTime(_CHInfo[i])));
+    }
+    else{
+      for(var j = 0;j < _CHLastUpdatedColumn;++j){
+        _CHSheet[i].push("");
+      }
+      _CHSheet[i][1] = "Not Found";
+      _CHSheet[i][2] = _CHID[i];
+    }
   }
   _RosterSheet.getRange(_RosterSheetFirstCharacterScannedRow, 1, _RosterSheetAmountOfRows-_AmountOfHeaders, _CHLastUpdatedColumn).setValues(_CHSheet);
   if(_AlarmWrongilvl)

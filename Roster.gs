@@ -57,7 +57,6 @@ var _RosterSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Roster'
 
 function startFCRosterSheet() {
 	if(isAPIKeyValid()){
-      buildServerList();
 	  _FCID = _FCRosterSheet.getRange(_FCRow,_CHIDColumn).getDisplayValue()
       
 	  // (Free Company Addon)
@@ -80,20 +79,14 @@ function startFCRosterSheet() {
 // fetch FC info
 function fetchFCInfo() {
   _FCID = _FCRosterSheet.getRange(_FCRow,_CHIDColumn).getDisplayValue();
-  // https://xivapi.com/freecompany/<lodestone_id>?data=FCM,FCM&extended=1
-  var loading = false, error = false;
   _FCInfo = JSON.parse(UrlFetchApp.fetch("https://xivapi.com/freecompany/" + _FCID + "?key=" + _APIKey + "&data=FCM").getContentText());
 
-  if(_FCInfo.Info.FreeCompany.State === _APILoadingStateEnum.LOADING){
-      _FCRosterSheet.getRange(FCRow, _FCNameColumn).setValue("Loading...");
-   }
-    
-   if(_FCInfo.Info.FreeCompany.State === _APILoadingStateEnum.NOT_FOUND){
-      _FCRosterSheet.getRange(FCRow, _FCNameColumn).setValue("Not Found");
-   }
-    
-   if(_FCInfo.Info.FreeCompany.State === _APILoadingStateEnum.READY){
+  if(_FCInfo.hasOwnProperty('FreeCompany')){
       updateFC(_FCInfo,_FCRow);
+   }
+    
+   else{
+      _FCRosterSheet.getRange(FCRow, _FCNameColumn).setValue("Not Found");
    }
 }
 
@@ -106,7 +99,7 @@ function updateFC(freecompany, row) {
   _FCRosterSheet.getRange(row, _FCNameColumn).setValue("=HYPERLINK(\"https://na.finalfantasyxiv.com/lodestone/freecompany/" + freecompany.FreeCompany.ID.replace('i','') + "\", \"" + freecompany.FreeCompany.Name + " «" + freecompany.FreeCompany.Tag + "» " + "\")");
   
   // add server FC is from
-  _FCRosterSheet.getRange(row, _FCServerColumn).setValue(_Servers[freecompany.FreeCompany.Server] + ' / ' + freecompany.FreeCompany.Server);
+  _FCRosterSheet.getRange(row, _FCServerColumn).setValue(freecompany.FreeCompany.Server);
   
   // add Membership Count
   _FCRosterSheet.getRange(row, _FCMemberCountColumn).setValue(freecompany.FreeCompanyMembers.length);

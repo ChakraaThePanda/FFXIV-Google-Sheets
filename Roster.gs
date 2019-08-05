@@ -25,11 +25,11 @@ var _RosterSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Roster'
 	_CHID = [], 
     _CHInfo = [], 
 	_CHSheet = [],
+    _CHSheet2 = [],
     _CHIDColumn = 3,
     _CHFCJoinDate = 39,	
-	_CHLastUpdatedColumn = 37,
+	_CHLastUpdatedColumn = 36,
     _ClassOrder = [1,3,32,37,6,26,33,2,4,29,34,5,31,38,7,26,35,36,8,9,10,11,12,13,14,15,16,17,18], //The order is a bit weird, but the API is done like that. In the desired order (Tank, Heal, DPS, DoH, DoL). The IDs of the classes.
-    _APILoadingStateEnum = {"LOADING":1, "READY":2, "NOT_FOUND":3},
 	_APIKey = "",
     _AlarmWrongilvl = false;
 
@@ -52,11 +52,13 @@ var _RosterSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Roster'
     _FCServerColumn = 4,
     _FCMemberCountColumn = 5,
     _FCServerRankColumn = 6,
-    _FCTimeEquation = 38;
+    _FCTimeEquation = 38,
+    _RunningFCScript = false;
       
 
 function startFCRosterSheet() {
 	if(isAPIKeyValid()){
+      _RunningFCScript = true;
 	  _FCID = _FCRosterSheet.getRange(_FCRow,_CHIDColumn).getDisplayValue()
       
 	  // (Free Company Addon)
@@ -67,6 +69,7 @@ function startFCRosterSheet() {
 	  }
 	  
 	  // If we are using the FCSheet, all the data of the RosterSheet becomes the one from FCRosterSheet
+      _CHLastUpdatedColumn = _CHLastUpdatedColumn + 1;
 	  _RosterSheet = _FCRosterSheet;
 	  _RosterSheetAmountOfRows = _FCRosterSheetAmountOfRows;
 	  _RosterSheetFirstCharacterScannedRow = _FCRosterSheetFirstCharacterScannedRow;
@@ -99,7 +102,7 @@ function updateFC(freecompany, row) {
   _FCRosterSheet.getRange(row, _FCNameColumn).setValue("=HYPERLINK(\"https://na.finalfantasyxiv.com/lodestone/freecompany/" + freecompany.FreeCompany.ID.replace('i','') + "\", \"" + freecompany.FreeCompany.Name + " «" + freecompany.FreeCompany.Tag + "» " + "\")");
   
   // add server FC is from
-  _FCRosterSheet.getRange(row, _FCServerColumn).setValue(freecompany.FreeCompany.Server);
+  _FCRosterSheet.getRange(row, _FCServerColumn).setValue(freecompany.FreeCompany.Server + " (" + freecompany.FreeCompany.DC + ")");
   
   // add Membership Count
   _FCRosterSheet.getRange(row, _FCMemberCountColumn).setValue(freecompany.FreeCompanyMembers.length);
@@ -131,6 +134,7 @@ function addNewIDs() {
   for(var i = 0; i < _FCInfo.FreeCompanyMembers.length; i++) {
     parsedIDs[i] = _FCInfo.FreeCompanyMembers[i].ID
     parsedIDs[i] = parseInt(parsedIDs[i])
+    
   }
   
   // filter parsed IDs with sheet IDs to retrieve new IDs to the sheet
@@ -310,7 +314,10 @@ function fetchCharacterInfos() {
 		};
 		_CHInfo = _CHInfo.concat(JSON.parse(UrlFetchApp.fetch("https://xivapi.com/characters", options).getContentText()));
 	}
-	updateCharacter();
+    if(_RunningFCScript)
+      updateCharacterFCSheet();
+    else
+      updateCharacter();
   }
 }
 
@@ -321,12 +328,11 @@ function updateCharacter(){
       _CHSheet[i][0] = "=HYPERLINK(\"" + _CHInfo[i].Character.Portrait + "\", IMAGE(\""+ _CHInfo[i].Character.Avatar + "\"))";
       _CHSheet[i][1] = "=HYPERLINK(\"https://na.finalfantasyxiv.com/lodestone/character/" + _CHInfo[i].Character.ID + "\", \"" + _CHInfo[i].Character.Name + "\")";
       _CHSheet[i][2] = _CHInfo[i].Character.ID;
-      _CHSheet[i][3] = _CHInfo[i].Character.Server;
+      _CHSheet[i][3] = _CHInfo[i].Character.Server + " (" + _CHInfo[i].Character.DC + ")";
       _CHSheet[i][4] = updateFreeCompany(_CHInfo[i]);
-      _CHSheet[i][5] = "";
-      _CHSheet[i][6] = updateCurrentClass(_CHInfo[i]);
-      _CHSheet[i][7] = new Date(_CHInfo[i].Character.ParseDate * 1000);
-      _CHSheet[i].splice.apply(_CHSheet[i],[7,0].concat(updateClassJobsAndTime(_CHInfo[i])));
+      _CHSheet[i][5] = updateCurrentClass(_CHInfo[i]);
+      _CHSheet[i][6] = new Date(_CHInfo[i].Character.ParseDate * 1000);
+      _CHSheet[i].splice.apply(_CHSheet[i],[6,0].concat(updateClassJobsAndTime(_CHInfo[i])));
     }
     else{
       for(var j = 0;j < _CHLastUpdatedColumn;++j){
@@ -336,7 +342,41 @@ function updateCharacter(){
       _CHSheet[i][2] = _CHID[i];
     }
   }
-  _RosterSheet.getRange(_RosterSheetFirstCharacterScannedRow, 1, _RosterSheetAmountOfRows-_AmountOfHeaders, _CHLastUpdatedColumn).setValues(_CHSheet);
+  _RosterSheet.getRange(_RosterSheetFirstCharacterScannedRow, 1, _RosterSheetAmountOfRows-_AmountOfHeaders, _CHLastUpdatedColumn).setValues(_CHSheet);   
+  if(_AlarmWrongilvl)
+    SpreadsheetApp.getUi().alert("Oh oh, something happened!", 
+                                   "It looks like some of the equipment one of the characters is wearing hasn't been added to the database yet." + '\n' + "The shown equipped ilvl might be wrong, but the rest of the sheet is as normal." + '\n' +  "It should be fixed automatically shortly.",
+                                  SpreadsheetApp.getUi().ButtonSet.OK);    
+}
+
+function updateCharacterFCSheet(){
+  var ColumnNumberToSplit = 5;
+  for(var i = 0;i < _CHID.length;++i){
+      _CHSheet[i] = [],
+      _CHSheet2[i] = [];
+    if(_CHInfo[i].hasOwnProperty('Character')){
+      _CHSheet[i][0] = "=HYPERLINK(\"" + _CHInfo[i].Character.Portrait + "\", IMAGE(\""+ _CHInfo[i].Character.Avatar + "\"))";
+      _CHSheet[i][1] = "=HYPERLINK(\"https://na.finalfantasyxiv.com/lodestone/character/" + _CHInfo[i].Character.ID + "\", \"" + _CHInfo[i].Character.Name + "\")";
+      _CHSheet[i][2] = _CHInfo[i].Character.ID;
+      _CHSheet[i][3] = _CHInfo[i].Character.Server + " (" + _CHInfo[i].Character.DC + ")";
+      _CHSheet[i][4] = updateFreeCompany(_CHInfo[i]);
+      _CHSheet2[i][0] = updateCurrentClass(_CHInfo[i]);
+      _CHSheet2[i][1] = new Date(_CHInfo[i].Character.ParseDate * 1000);
+      _CHSheet2[i].splice.apply(_CHSheet2[i],[1,0].concat(updateClassJobsAndTime(_CHInfo[i])));
+    }
+    else{
+      for(var j = 0;j < ColumnNumberToSplit;++j){ //The 5 is really bad but I dont know how to do better
+        _CHSheet[i].push("");
+      }
+      for(var j = ColumnNumberToSplit + 1;j < _CHLastUpdatedColumn;++j){
+        _CHSheet2[i].push("");
+      }
+      _CHSheet[i][1] = "Not Found";
+      _CHSheet[i][2] = _CHID[i];
+    }
+  }
+  _RosterSheet.getRange(_RosterSheetFirstCharacterScannedRow, 1, _RosterSheetAmountOfRows-_AmountOfHeaders, ColumnNumberToSplit).setValues(_CHSheet);
+  _RosterSheet.getRange(_RosterSheetFirstCharacterScannedRow, ColumnNumberToSplit + 2, _RosterSheetAmountOfRows-_AmountOfHeaders, _CHLastUpdatedColumn - (ColumnNumberToSplit + 1)).setValues(_CHSheet2);
   if(_AlarmWrongilvl)
     SpreadsheetApp.getUi().alert("Oh oh, something happened!", 
                                    "It looks like some of the equipment one of the characters is wearing hasn't been added to the database yet." + '\n' + "The shown equipped ilvl might be wrong, but the rest of the sheet is as normal." + '\n' +  "It should be fixed automatically shortly.",
@@ -412,24 +452,6 @@ function updateClassJobsAndTime(character){
     }
   }
   return AllClasses;
-}
-
-// Function to force updates every 6 hours. Called by TimeBased Triggers in Google Sheets.
-function fetchUpdateIDsFromSheet(){
-	if(isAPIKeyValid()){
-		var CHSheetID,
-		FCID = _FCRosterSheet.getRange(_FCRow, _FCIDColumn).getDisplayValue();
-		
-	  for(var i = 0, j = _RosterSheetFirstCharacterScannedRow; i < _RosterSheetAmountOfRows; ++i, ++j){
-		  CHSheetID = _RosterSheet.getRange(j,_CHIDColumn).getDisplayValue();
-		if(CHSheetID !== "")
-		  _CHID[i] = CHSheetID;
-	  }
-	  for(var i = 0, row = _RosterSheetFirstCharacterScannedRow; i < _CHID.length; ++i, ++row)
-		UrlFetchApp.fetch("https://xivapi.com/character/" + _CHID[i] + "/update?key=" + _APIKey).getContentText();
-	  if(FCID != "")
-		UrlFetchApp.fetch("https://xivapi.com/freecompany/" + FCID + "/update?key=" + _APIKey).getContentText();
-	}
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////

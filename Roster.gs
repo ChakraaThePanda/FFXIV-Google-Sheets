@@ -3,7 +3,7 @@
 // * Created by Chakraa Arcana @ Leviathan.
 // * Discord: Chakraa#1837
 // * Created on: Jan 25th 2019
-// * Purpose: Through the use of https://staging.xivapi.com/, the goal is to display selected information of the
+// * Purpose: Through the use of https://xivapi.com/, the goal is to display selected information of the
 // * selected characters through their LodestoneID.
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 

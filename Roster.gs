@@ -335,7 +335,7 @@ function fetchCharacterInfos() {
   if(!pollingError){
 	var apikey = _InstructionsSheet.getRange(_InstructionsSheetAPIKeyRow,1).getDisplayValue();
 	var temparray;
-	var chunk = 1;
+	var chunk = 2;
 	for(var i = 0; i < _CHID.length; i += chunk){
         temparray = _CHID.slice(i,i+chunk);
 		var options = {

@@ -29,7 +29,7 @@ var _RosterSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Roster'
     _CHIDColumn = 3,
     _CHFCJoinDate = 39,	
 	_CHLastUpdatedColumn = 36,
-    _ClassOrder = [1,3,32,37,6,26,33,2,4,29,34,5,31,38,7,26,35,36,8,9,10,11,12,13,14,15,16,17,18], //The order is a bit weird, but the API is done like that. In the desired order (Tank, Heal, DPS, DoH, DoL). The IDs of the classes.
+    _ClassOrder = [19,21,32,37,24,28,33,20,22,30,34,23,31,38,25,27,35,36,8,9,10,11,12,13,14,15,16,17,18], //The order is a bit weird, but the API is done like that. In the desired order (Tank, Heal, DPS, DoH, DoL). The IDs of the classes.
 	_APIKey = "",
     _AlarmWrongilvl = false;
 
@@ -471,7 +471,7 @@ function updateClassJobsAndTime(character){
     AllClasses[j] = "-";
     for(var i = 0; i < _ClassOrder.length; ++i){
       if(classJobs[keys[i]] != null)
-        if(classJobs[keys[i]].Class.ID === _ClassOrder[j]){
+        if(classJobs[keys[i]].Job.ID === _ClassOrder[j]){
           if(classJobs[keys[i]].Level === 0){ //Put "-" instead of 0 when the person has not yet unlock his class.
             AllClasses[j] = "-";
           }

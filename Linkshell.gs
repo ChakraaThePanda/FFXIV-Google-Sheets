@@ -1,7 +1,6 @@
 /*
 
-The following IDs are tied to Linkshells
-
+To be filled at a later time.
 
 
 */

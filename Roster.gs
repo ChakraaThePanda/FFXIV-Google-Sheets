@@ -102,13 +102,13 @@ function updateCharacterInfos() {
   /** If the ID is non-empty */
   if (!pollingError) {
     for (var i = 0; i < _CHID.length; i++) {
-      var k = _CHID[i][0]
+      var charID = _CHID[i][0]
       var options = {
         muteHttpExceptions: true,
         method: 'POST',
         payload: JSON.stringify({
-          id: k.toString(),
-          key: _APIKey,
+          id: charID,
+          private_key: _APIKey,
           data: 'FCM',
           extended: 1
         })

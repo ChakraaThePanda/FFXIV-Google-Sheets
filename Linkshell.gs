@@ -1,6 +1,8 @@
-/*
-
-To be filled at a later time.
+/** Specific to Linkshell functions. */
 
 
-*/
+function runLSScript() {
+
+    updateLinkshell()
+    updateCurrentRoster();
+  }

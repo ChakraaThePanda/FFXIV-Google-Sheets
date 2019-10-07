@@ -1,20 +1,20 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // * FFXIV Automatic Spreadsheet
-// * Created by Chakraa Arcana @ Leviathan.
-// * Discord: Chakraa#1837
+// * Created by Chakraa Arcana @ Leviathan with contributions from Raven Ambree @ Excalibur
+// * Discord: Chakraa#1837 or Onlyme#7038 (respectively)
 // * Created on: Jan 25th 2019
 // * Purpose: Through the use of https://xivapi.com/, the goal is to display selected information of the
 // * selected characters through their LodestoneID.
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-/*
- * Declaration of a bunch of Global Variables used throughout the script.
- * The hard coded numbers represent the column/row number in which the information
- * need to be placed or pick off.
- * Prefix codes
+/**
+ * Declaration of a bunch of global variables used throughout the script(s).
+ * Hard coded integers represent column/row numbers.
+ * Variable Prefix codes:
  * _CH for Character
  * _FC for Free Company
+ * _LS for Linkshell
  */
 
 var _RosterSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Roster'),
@@ -23,90 +23,72 @@ var _RosterSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Roster'
   _InstructionsSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Instructions'),
   _InstructionsSheetAPIKeyRow = 4,
   _AmountOfHeaders = 1,
+
+  /** Character global values */
   _CHID = [],
   _CHLastUpdated = [],
-  _CHInfo = [],
-  _CHSheet = [],
-  _CHSheet2 = [],
   _CHIDColumn = 3,
-  _CHFCJoinDate = 39,
-  _CHLastUpdatedColumn = 36,
-  _CHTimeEquation = 38,
-  _ClassOrder = [19, 21, 32, 37, 24, 28, 33, 20, 22, 30, 34, 23, 31, 38, 25, 27, 35, 36, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18], //The order is a bit weird, but the API is done like that. In the desired order (Tank, Heal, DPS, DoH, DoL). The IDs of the classes.
+  _CHLastUpdatedColumn = 37,
+  _CHTimeEquationColumn = 38,
+  _CHListDate = 39,
+
+  /**
+   * The order is a bit weird, but the API is done like that.
+   * In the desired order (Tank, Heal, DPS, DoH, DoL). The IDs of the classes.
+   */
+  _ClassOrder = [19, 21, 32, 37, 24, 28, 33, 20, 22, 30, 34, 23, 31, 38, 25, 27, 35, 36, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
   _APIKey = "",
   _AlarmWrongilvl = false;
-  _RunningFCScript = false;
-  _RunningLSScript = false;
-
-
-/*
- * Collection of settings functions for the Roster, including name changes
- */
-
-function runFCScript() {
-  _RosterSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('FC Roster'),
-  _AmountOfHeaders = 3,
-  _RosterSheetFirstCharacterScannedRow = 4,
-  _FCRosterSheetAmountOfRows = _FCRosterSheet.getLastRow() - _FCAmountOfHeaders,
-  _FCID = 0,
-  _FCRow = 2,
-  _FCAPIInfo = "",
-  _FCStoredIDs = [],
-  _FCAvatarColumn = 1,
-  _FCNameColumn = 2,
-  _FCIDColumn = 3,
-  _FCServerColumn = 4,
-  _FCMemberCountColumn = 5,
-  _FCServerRankColumn = 6,
-  _FCTimeEquation = 38;
-
-  updateCurrentSheet();
-}
-
-function runLSScript() {
-
-
-  updateCurrentSheet();
-}
-
-
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
-// * Beginning of the Roster Sheet Code by Chakraa Arcana
+// * Beginning of the Roster Sheet Code by Chakraa Arcana @ Leviathan
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function updateCurrentSheet() {
+function updateCurrentRoster() {
   if (isAPIKeyValid()) {
+    /** get every ID, when it was last checked, and which row it is from the sheet */
     _CHID = _RosterSheet.getRange(_RosterSheetFirstCharacterScannedRow, _CHIDColumn, _RosterSheetAmountOfRows - _AmountOfHeaders, 1).getDisplayValues();
-    fetchCharacterInfos();
+    _CHLastUpdated = _RosterSheet.getRange(_RosterSheetFirstCharacterScannedRow, _CHLastUpdatedColumn, _RosterSheetAmountOfRows - _AmountOfHeaders, 1).getDisplayValues();
+    /** update the characters found */
+    updateCharacterInfos();
   }
 }
 
 function isAPIKeyValid() {
+  /** Is the API key field in the instructions list blank? */
   if (_InstructionsSheet.getRange(_InstructionsSheetAPIKeyRow, 1).getDisplayValue() == "") {
     SpreadsheetApp.getUi().alert("Oh oh, something happened!",
       "Make sure that you have your API Key in the Red Box in the Instructions Page.",
       SpreadsheetApp.getUi().ButtonSet.OK);
+    /**  If blank, put in a key by following the writing on the instructions page. */
     return false;
 
   }
+  /** Is the key incorrectly set? */
   else if (/\s/g.test(_InstructionsSheet.getRange(_InstructionsSheetAPIKeyRow, 1).getDisplayValue())) {
     SpreadsheetApp.getUi().alert("Oh oh, something happened!",
       "Make sure that your API Key is correctly set in the Red Box of the Instructions Page and doesn't have any spaces, tabs or line returns.",
       SpreadsheetApp.getUi().ButtonSet.OK);
+    // Gotta fix the formatting of that key
     return false;
   }
   else {
+    /** API key is good! Use it */
     _APIKey = _InstructionsSheet.getRange(_InstructionsSheetAPIKeyRow, 1).getDisplayValue();
     return true;
   }
 }
 
-function fetchCharacterInfos() {
+
+
+/** Update each row by pulling from the characters lodestone ID */
+function updateCharacterInfos() {
   var pollingError = false;
 
+  /** For each row in ID... */
   for (var i = 0; i < _CHID.length; ++i) {
+    /** If the row is empty, skip it and pop an error window out. */
     if (_CHID[i] == "") {
       SpreadsheetApp.getUi().alert("Oh oh, something happened!",
         "Make sure that you don't have data in any cells anywhere else than the rows you have Lodestone IDs in. If you aren't sure, clear everyone and rerun the script :)",
@@ -116,56 +98,62 @@ function fetchCharacterInfos() {
     }
   }
 
+
+  /** If the ID is non-empty */
   if (!pollingError) {
-    var apikey = _InstructionsSheet.getRange(_InstructionsSheetAPIKeyRow, 1).getDisplayValue();
-    for (var i = 0; i < _CHID.length; i += chunk) {
-      temparray = _CHID.slice(i, i + chunk);
+    for (var i = 0; i < _CHID.length; i++) {
+      var k = _CHID[i][0]
       var options = {
         muteHttpExceptions: true,
         method: 'POST',
         payload: JSON.stringify({
-          key: apikey,
-          ids: temparray.toString(),
-          data: 'FC',
+          id: k.toString(),
+          key: _APIKey,
+          data: 'FCM',
           extended: 1
         })
       };
-      _CHInfo = _CHInfo.concat(JSON.parse(UrlFetchApp.fetch("https://xivapi.com/characters", options).getContentText()));
-    }
-      updateCharacter();
+
+      /** 
+       * Retrieve the current character's info
+       * and update it on the sheet.
+       */
+      var CHInfo = JSON.parse(UrlFetchApp.fetch("https://xivapi.com/character", options).getContentText());
+      updateCharacter(CHInfo);
+    } /** end loop */
   }
 }
 
-function updateCharacter() {
-  for (var i = 0; i < _CHID.length; ++i) {
-    _CHSheet = [];
+/** update character info with raw parsed info provided. */
+function updateCharacter(CHParse) {
+  /** CHLine will be pasted back to the sheet */  
+  CHLine = [];
 
-    if (_CHInfo[i].hasOwnProperty('Character')) {
+    if (CHParse.hasOwnProperty('Character')) {
 
-      // If the character ID is valid, and has data from it
-      _CHSheet[0] = "=HYPERLINK(\"" + _CHInfo[i].Character.Portrait + "\", IMAGE(\"" + _CHInfo[i].Character.Avatar + "\"))";
-      _CHSheet[1] = "=HYPERLINK(\"https://na.finalfantasyxiv.com/lodestone/character/" + _CHInfo[i].Character.ID + "\", \"" + _CHInfo[i].Character.Name + "\")";
-      _CHSheet[2] = _CHInfo[i].Character.ID;
-      _CHSheet[3] = _CHInfo[i].Character.Server + " (" + _CHInfo[i].Character.DC + ")";
-      _CHSheet[4] = updateFreeCompany(_CHInfo[i]);
-      _CHSheet[5] = updateCurrentClass(_CHInfo[i]);
-      _CHSheet[6] = new Date(_CHInfo[i].Character.ParseDate * 1000);
-      _CHSheet.splice.apply(_CHSheet[i], [6, 0].concat(updateClassJobsAndTime(_CHInfo[i])));
+      /** If the character ID is valid, get the character's data */
+      CHLine[0] = "=HYPERLINK(\"" + CHParse.Character.Portrait + "\", IMAGE(\"" + CHParse.Character.Avatar + "\"))";
+      CHLine[1] = "=HYPERLINK(\"https://na.finalfantasyxiv.com/lodestone/character/" + CHParse.Character.ID + "\", \"" + CHParse.Character.Name + "\")";
+      CHLine[2] = CHParse.Character.ID;
+      CHLine[3] = CHParse.Character.Server + " (" + CHParse.Character.DC + ")";
+      CHLine[4] = CHParse.Character.Server
+      CHLine[5] = updateFreeCompanyRank
+      CHLine[6] = updateCurrentClass(CHParse);
+      CHLine[7] = new Date(CHParse.Character.ParseDate * 1000);
+      CHLine.splice.apply(_CHLine, [6, 0].concat(updateClassJobsAndTime(CHParse)));
 
     } else {
-      // If the character ID is not valid, blank the line and state "Not Found"
+      /** If the character ID is not valid, blank the line and state "Not Found" in the name */
       for (var j = 0; j < _CHLastUpdatedColumn; ++j) {
-        _CHSheet[i].push("");
+        CHLine[i].push("");
       }
 
-      _CHSheet[1] = "Not Found";
-      _CHSheet[2] = _CHID[i];
+      CHLine[1] = "Not Found";
+      CHLine[2] = _CHID[i];
     }
 
 
-    _RosterSheet.getRange(_RosterSheetFirstCharacterScannedRow, 1, _RosterSheetAmountOfRows - _AmountOfHeaders, _CHLastUpdatedColumn).setValues(_CHSheet);
-
-  }
+    _RosterSheet.getRange(_RosterSheetFirstCharacterScannedRow, 1, _RosterSheetAmountOfRows - _AmountOfHeaders, _CHLastUpdatedColumn).setValues(CHLine);
 
 
   if (_AlarmWrongilvl)
@@ -266,6 +254,3 @@ function runtimeCountStop(start) {
   }
   return setRuntime;
 }
-
-
-/* After this line are helper methods used in both scripts. */

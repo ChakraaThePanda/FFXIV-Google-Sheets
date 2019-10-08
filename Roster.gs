@@ -111,7 +111,7 @@ function updateCharacterInfos() {
 
 
     /** How many requests at a time */
-    var chunk = 10,
+    var chunk = 1,
       charParse = [],
       CHInfo = [];
     for (var i = 0; i < _CHID.length; i + chunk) {
@@ -120,7 +120,7 @@ function updateCharacterInfos() {
       for (var j = 0; i + j < _CHID.length; j++) {
 
         var charID = _CHID[i + j][0]
-        
+
         charParse[j] = 'https://xivapi.com/character/' + charID + '?key=' + _APIKey + '&data=FC,FCM&extended=1'
 
         /**      Old way of doing things.
@@ -161,7 +161,7 @@ function updateCharacter(CHParse) {
     CHLine[5] = updateFreeCompanyRank(CHParse);
     CHLine[6] = updateCurrentClass(CHParse);
     CHLine[7] = new Date(CHParse.Character.ParseDate * 1000);
-    CHLine.splice.apply(_CHLine, [6, 0].concat(updateClassJobsAndTime(CHParse)));
+    CHLine.splice.apply(CHLine, [6, 0].concat(updateClassJobsAndTime(CHParse)));
 
   } else {
     /** If the character ID is not valid, blank the line and state "Not Found" */
@@ -215,8 +215,6 @@ function updateFreeCompanyRank(character) {
 
   return FCRank;
 }
-
-
 
 function updateCurrentClass(character) {
   var ilvl = 0,

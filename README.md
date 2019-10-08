@@ -5,6 +5,7 @@ Discord: Chakraa#1837
 
 **Contributor(s)**:  
 Raven Ambree @ Excalibur
+Discord: Onlyme#7038
 
 **Purpose**:  
 Through the use of [XIVAPI](https://xivapi.com/), the goal is to display selected information of the

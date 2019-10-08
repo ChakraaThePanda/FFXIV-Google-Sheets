@@ -20,6 +20,7 @@ var _FCRosterSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('FC Ro
     _FCServerRankColumn = 6;
 
 function runFCScript() {
+    // Name of sheet to update
     _RosterSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('FC Roster'),
         _AmountOfHeaders = 3,
         _RosterSheetFirstCharacterScannedRow = 4,

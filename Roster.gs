@@ -3,7 +3,7 @@
 // * Created by Chakraa Arcana @ Leviathan with contributions from Raven Ambree @ Excalibur
 // * Discord: Chakraa#1837 or Onlyme#7038 (respectively)
 // * Created on: Jan 25th 2019
-// * Purpose: Through the use of https://xivapi.com/, the goal is to display selected information of the
+// * Purpose: Through the use of https://xivapi.com/, display information of the
 // * selected characters through their LodestoneID.
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -17,12 +17,23 @@
  * _LS for Linkshell
  */
 
-var _RosterSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Roster'),
+/** Instruction sheet configuration data. Do not change */
+var _InstructionsSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Instructions'),
+  _InstructionsSheetAPIKeyRow = 4,
+
+  /** What sheet are we using? */
+  _RosterSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Roster'),
   _RosterSheetAmountOfRows = _RosterSheet.getLastRow(),
   _RosterSheetFirstCharacterScannedRow = 2,
-  _InstructionsSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Instructions'),
-  _InstructionsSheetAPIKeyRow = 4,
+
+
   _AmountOfHeaders = 1,
+
+  /** What kind of sheet is it? Just your friends, your FC, your Linkshell?
+   * Options: "Character", "Free Company", "Linkshell"
+   * Default _SheetType = "Character"
+   */
+  _SheetType = "Character",
 
   /** Character global values */
   _CHID = [],
@@ -40,10 +51,6 @@ var _RosterSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Roster'
   _APIKey = "",
   _AlarmWrongilvl = false;
 
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
-// * Beginning of the Roster Sheet Code by Chakraa Arcana @ Leviathan
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function updateCurrentRoster() {
   if (isAPIKeyValid()) {
@@ -101,24 +108,38 @@ function updateCharacterInfos() {
 
   /** If the ID is non-empty */
   if (!pollingError) {
-    for (var i = 0; i < _CHID.length; i++) {
-      var charID = _CHID[i][0]
-      var options = {
-        muteHttpExceptions: true,
-        method: 'POST',
-        payload: JSON.stringify({
-          id: charID,
-          private_key: _APIKey,
-          data: 'FCM',
-          extended: 1
-        })
-      };
 
-      /** 
-       * Retrieve the current character's info
-       * and update it on the sheet.
-       */
-      var CHInfo = JSON.parse(UrlFetchApp.fetch("https://xivapi.com/character", options).getContentText());
+
+    /** How many requests at a time */
+    var chunk = 10,
+      charParse = [],
+      CHInfo = [];
+    for (var i = 0; i < _CHID.length; i + chunk) {
+
+      /** Format the requests to the api */
+      for (var j = 0; i + j < _CHID.length; j++) {
+
+        var charID = _CHID[i + j][0]
+        
+        charParse[j] = 'https://xivapi.com/character/' + charID + '?key=' + _APIKey + '&data=FC,FCM&extended=1'
+
+        /**      Old way of doing things.
+         * var options = {
+                muteHttpExceptions: true,
+                method: 'POST',
+                payload: JSON.stringify({
+                  id: charID,
+                  private_key: _APIKey,
+                  data: 'FCM',
+                  extended: 1
+                })
+              };
+         * var CHInfo = JSON.parse(UrlFetchApp.fetch("https://xivapi.com/character", options).getContentText());
+         * var CHInfo = JSON.parse(UrlFetchApp.fetch("https://xivapi.com/character/" + charID + "?key=" + _APIKey + "&data=FCM&extended=1"))
+         */
+      }
+
+      CHInfo = JSON.parse(UrlFetchApp.fetchAll(charParse).getContentText());
       updateCharacter(CHInfo);
     } /** end loop */
   }
@@ -126,34 +147,34 @@ function updateCharacterInfos() {
 
 /** update character info with raw parsed info provided. */
 function updateCharacter(CHParse) {
-  /** CHLine will be pasted back to the sheet */  
+  /** CHLine will be pasted back to the sheet */
   CHLine = [];
 
-    if (CHParse.hasOwnProperty('Character')) {
+  if (CHParse.hasOwnProperty('Character')) {
 
-      /** If the character ID is valid, get the character's data */
-      CHLine[0] = "=HYPERLINK(\"" + CHParse.Character.Portrait + "\", IMAGE(\"" + CHParse.Character.Avatar + "\"))";
-      CHLine[1] = "=HYPERLINK(\"https://na.finalfantasyxiv.com/lodestone/character/" + CHParse.Character.ID + "\", \"" + CHParse.Character.Name + "\")";
-      CHLine[2] = CHParse.Character.ID;
-      CHLine[3] = CHParse.Character.Server + " (" + CHParse.Character.DC + ")";
-      CHLine[4] = CHParse.Character.Server
-      CHLine[5] = updateFreeCompanyRank
-      CHLine[6] = updateCurrentClass(CHParse);
-      CHLine[7] = new Date(CHParse.Character.ParseDate * 1000);
-      CHLine.splice.apply(_CHLine, [6, 0].concat(updateClassJobsAndTime(CHParse)));
+    /** If the character ID is valid, get the character's data */
+    CHLine[0] = "=HYPERLINK(\"" + CHParse.Character.Portrait + "\", IMAGE(\"" + CHParse.Character.Avatar + "\"))";
+    CHLine[1] = "=HYPERLINK(\"https://na.finalfantasyxiv.com/lodestone/character/" + CHParse.Character.ID + "\", \"" + CHParse.Character.Name + "\")";
+    CHLine[2] = CHParse.Character.ID;
+    CHLine[3] = CHParse.Character.Server + " (" + CHParse.Character.DC + ")";
+    CHLine[4] = updateFreeCompany(CHParse);
+    CHLine[5] = updateFreeCompanyRank(CHParse);
+    CHLine[6] = updateCurrentClass(CHParse);
+    CHLine[7] = new Date(CHParse.Character.ParseDate * 1000);
+    CHLine.splice.apply(_CHLine, [6, 0].concat(updateClassJobsAndTime(CHParse)));
 
-    } else {
-      /** If the character ID is not valid, blank the line and state "Not Found" in the name */
-      for (var j = 0; j < _CHLastUpdatedColumn; ++j) {
-        CHLine[i].push("");
-      }
-
-      CHLine[1] = "Not Found";
-      CHLine[2] = _CHID[i];
+  } else {
+    /** If the character ID is not valid, blank the line and state "Not Found" */
+    for (var j = 0; j < _CHLastUpdatedColumn; ++j) {
+      CHLine[i].push("");
     }
 
+    CHLine[1] = "Not Found";
+    CHLine[2] = _CHID[i];
+  }
 
-    _RosterSheet.getRange(_RosterSheetFirstCharacterScannedRow, 1, _RosterSheetAmountOfRows - _AmountOfHeaders, _CHLastUpdatedColumn).setValues(CHLine);
+
+  _RosterSheet.getRange(_RosterSheetFirstCharacterScannedRow, 1, _RosterSheetAmountOfRows - _AmountOfHeaders, _CHLastUpdatedColumn).setValues(CHLine);
 
 
   if (_AlarmWrongilvl)
@@ -163,17 +184,39 @@ function updateCharacter(CHParse) {
 }
 
 function updateFreeCompany(character) {
-  var FCName = "", FCRank = "";
+  /** Assume no FC */
+  var FCName = "";
+
+  /** If character is in a Free Company */
   if (character.Character.FreeCompanyId !== null) {
+
+    /** Retrieve the name and tag */
     if (character.FreeCompany !== null) {
       FCName = "=HYPERLINK(\"https://na.finalfantasyxiv.com/lodestone/freecompany/" + character.FreeCompany.ID.replace('i', '') + "\", \"" + character.FreeCompany.Name + " «" + character.FreeCompany.Tag + "» " + "\")";
-    }
-    else {
+    } else {
       FCName = "Loading...";
     }
   }
   return FCName;
 }
+
+function updateFreeCompanyRank(character) {
+  /** Assume no rank */
+  var FCRank = "";
+
+  /** If character is in a free company, check the unsorted list for their spot, then get their rank. */
+  for (var i = 0; i < character.FreeCompanyMembers.length; i++) {
+
+    if (character.FreeCompanyMembers[i].ID == character.ID) {
+      /** Found it. Update their rank */
+      FCRank = character.FreeCompanyMembers[i].Rank
+    }
+  }
+
+  return FCRank;
+}
+
+
 
 function updateCurrentClass(character) {
   var ilvl = 0,

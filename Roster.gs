@@ -152,8 +152,8 @@ function updateCharacter(CHParse) {
       CHLine[i][1] = "=HYPERLINK(\"https://na.finalfantasyxiv.com/lodestone/character/" + CHParse[i].Character.ID + "\", \"" + CHParse[i].Character.Name + "\")";
       CHLine[i][2] = CHParse[i].Character.ID;
       CHLine[i][3] = CHParse[i].Character.Server + " (" + CHParse[i].Character.DC + ")";
-      CHLine[i][4] = updateFreeCompany(CHParse[i]);
-      CHLine[i][5] = updateFreeCompanyRank(CHParse[i]);
+      CHLine[i][4] = updateCHFreeCompany(CHParse[i]);
+      CHLine[i][5] = updateCHFreeCompanyRank(CHParse[i]);
       CHLine[i][6] = updateCurrentClass(CHParse[i]);
       CHLine[i][7] = new Date(CHParse[i].Character.ParseDate * 1000);
       CHLine[i].splice.apply(CHLine[i], [7, 0].concat(updateClassJobsAndTime(CHParse[i])));
@@ -176,7 +176,7 @@ function updateCharacter(CHParse) {
       SpreadsheetApp.getUi().ButtonSet.OK);
 }
 
-function updateFreeCompany(character) {
+function updateCHFreeCompany(character) {
   /** Assume no FC */
   var FCName = "";
 
@@ -193,7 +193,7 @@ function updateFreeCompany(character) {
   return FCName;
 }
 
-function updateFreeCompanyRank(character) {
+function updateCHFreeCompanyRank(character) {
   /** Assume no rank */
   var FCRank = "";
 

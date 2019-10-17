@@ -114,13 +114,23 @@ function updateCharacterInfos() {
     }
   }
 
+  /** Retrieve character data in chunks, then paste those chunks to the spreadsheet. */
   if (!pollingError) {
     var options = [];
     var CHParse = [];
     var request = [];
+
+    /** Size of each payload segment. ie: retrieving count characters at a time from the API. */
     var count = 15;
+
+    /** 
+     * Outside loop: Number of chunks
+     * Inside loop: for each ID in the chunk, form a payload request to xivapi
+     */
     for (var i = 0; i < _CHID.length; i += count) {
       for (var j = 0; (j < count) && (i + j < _CHID.length); j++) {
+
+        /** JSON Payload request. aka: Black Magic. Don't touch! */
         options[j] = {
           url: 'https://xivapi.com/characters',
           muteHttpExceptions: true,
@@ -133,14 +143,17 @@ function updateCharacterInfos() {
           })
         };
       }
+      /** Sends out the requested amount of payloads. */
       request = request.concat(UrlFetchApp.fetchAll(options));
       options = [];
       Utilities.sleep(2000);
     }
   }
+/** Format the requests so elements can be retrived via arrays */
   request.forEach(function (element) {
     CHParse = CHParse.concat(JSON.parse(element.getContentText()));
   });
+
   updateCharacter(CHParse);
 }
 
@@ -153,7 +166,10 @@ function updateCharacter(CHParse) {
 
     if (CHParse[i].hasOwnProperty('Character')) {
 
-      /** If the character ID is valid, get the character's data */
+      /**
+       * If the character ID is valid, get character's data.
+       * Avatar, Hyperlinked Name, ID, Server / DC, Free Company, Free Company Rank, Current Class, Job Levels/EXP, Last Updated
+       */
       CHLine[i][0] = "=HYPERLINK(\"" + CHParse[i].Character.Portrait + "\", IMAGE(\"" + CHParse[i].Character.Avatar + "\"))";
       CHLine[i][1] = "=HYPERLINK(\"https://na.finalfantasyxiv.com/lodestone/character/" + CHParse[i].Character.ID + "\", \"" + CHParse[i].Character.Name + "\")";
       CHLine[i][2] = CHParse[i].Character.ID;
@@ -166,22 +182,25 @@ function updateCharacter(CHParse) {
 
     } else {
       /** If the character ID is not valid, blank the line and state "Not Found" */
-      for (var j = 0; j < _CHLastUpdatedColumn; ++j) {
-        CHLine[i].push("");
-      }
-
+      for (var j = 0; j < _CHLastUpdatedColumn; ++j) { CHLine[i].push(""); }
       CHLine[i][1] = "Not Found";
       CHLine[i][2] = _CHID[i];
     }
   }
+
+  /** Paste the formatted character data in the sheet. */
   _RosterSheet.getRange(_RosterSheetFirstCharacterScannedRow, 1, _RosterSheetAmountOfRows - _AmountOfHeaders, _CHLastUpdatedColumn).setValues(CHLine);
 
+  /** Error message for if item data is not able to be retrieved from xivapi */
   if (_AlarmWrongilvl)
     SpreadsheetApp.getUi().alert("Oh oh, something happened!",
       "It looks like some of the equipment one of the characters is wearing hasn't been added to the database yet." + '\n' + "The shown equipped ilvl might be wrong, but the rest of the sheet is as normal." + '\n' + "It should be fixed automatically shortly.",
       SpreadsheetApp.getUi().ButtonSet.OK);
 }
 
+/** Update a character's Free Company.
+ * @param Character xivapi parsed data with FC mode
+ */
 function updateFreeCompany(character) {
   /** Assume no FC */
   var FCName = "";
@@ -199,6 +218,10 @@ function updateFreeCompany(character) {
   return FCName;
 }
 
+/** 
+ * Update a character's Free Company Rank
+ * @param Character xivapi parsed data with FCM mode
+ */
 function updateFreeCompanyRank(character) {
   /** Assume no rank */
   var FCRank = "";
@@ -222,6 +245,10 @@ function updateFreeCompanyRank(character) {
   return FCRank;
 }
 
+/** 
+ * Update the character's currently equipped class/job
+ * @param Character xivapi parsed data
+ */
 function updateCurrentClass(character) {
   var ilvl = 0,
     gear = character.Character.GearSet.Gear,
@@ -251,6 +278,10 @@ function updateCurrentClass(character) {
   return abbreviation + ilvlstring;
 }
 
+/**
+ * Update character's job levels for every class, along with when they were last updated.
+ * @param Character xivapi parsed data
+ */
 function updateClassJobsAndTime(character) {
   var classJobs = character.Character.ClassJobs;
   var keys = Object.keys(classJobs);

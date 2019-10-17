@@ -114,40 +114,39 @@ function updateCharacterInfos() {
     }
   }
 
- if(!pollingError){
-	var temparray;
-	var chunk = 4;
-    var options;
+  if (!pollingError) {
+    var options = [];
     var CHParse = [];
-	for(var i = 0; i < _CHID.length; i += chunk){
-        temparray = _CHID.slice(i,i+chunk);
-		  options = {
-          url: 'https://xivapi.com/characters',
-          muteHttpExceptions : true,
-          method : 'POST',
-          payload : JSON.stringify({
-          key : _APIKey,
-          ids : temparray.toString(),
-          data : 'FC,FCM',
-          extended : 1
-          })
-		};
-       CHParse = CHParse.concat(JSON.parse(UrlFetchApp.fetchAll([options])));
+    for (var i = 0; i < _CHID.length; ++i) {
+      options[i] = {
+        url: 'https://xivapi.com/characters',
+        muteHttpExceptions: true,
+        method: 'POST',
+        payload: JSON.stringify({
+          key: _APIKey,
+          ids: _CHID[i],
+          data: 'FC,FCM',
+          extended: 1
+        })
+      };
     }
-
-      updateCharacter(CHParse);
+    var request = UrlFetchApp.fetchAll(options);
+    request.forEach(function (element) {
+      CHParse = CHParse.concat(JSON.parse(element.getContentText()));
+    });
+    updateCharacter(CHParse);
   }
 }
 
 /** update character info with raw parsed info provided. */
 function updateCharacter(CHParse) {
   var CHLine = [];
-  for(var i = 0;i < _CHID.length;++i){
+  for (var i = 0; i < _CHID.length; ++i) {
     /** CHLine will be pasted back to the sheet */
     CHLine[i] = [];
 
     if (CHParse[i].hasOwnProperty('Character')) {
-      
+
       /** If the character ID is valid, get the character's data */
       CHLine[i][0] = "=HYPERLINK(\"" + CHParse[i].Character.Portrait + "\", IMAGE(\"" + CHParse[i].Character.Avatar + "\"))";
       CHLine[i][1] = "=HYPERLINK(\"https://na.finalfantasyxiv.com/lodestone/character/" + CHParse[i].Character.ID + "\", \"" + CHParse[i].Character.Name + "\")";
@@ -158,13 +157,13 @@ function updateCharacter(CHParse) {
       CHLine[i][6] = updateCurrentClass(CHParse[i]);
       CHLine[i][7] = new Date(CHParse[i].Character.ParseDate * 1000);
       CHLine[i].splice.apply(CHLine[i], [7, 0].concat(updateClassJobsAndTime(CHParse[i])));
-      
+
     } else {
       /** If the character ID is not valid, blank the line and state "Not Found" */
       for (var j = 0; j < _CHLastUpdatedColumn; ++j) {
         CHLine[i].push("");
       }
-      
+
       CHLine[i][1] = "Not Found";
       CHLine[i][2] = _CHID[i];
     }
@@ -186,7 +185,7 @@ function updateFreeCompany(character) {
     if (character.FreeCompany !== null) {
       /** Retrieve the name and tag */
       FCName = "=HYPERLINK(\"https://na.finalfantasyxiv.com/lodestone/freecompany/" + character.FreeCompany.ID.replace('i', '') + "\", \"" + character.FreeCompany.Name + " «" + character.FreeCompany.Tag + "» " + "\")";
-    } 
+    }
     else {
       FCName = "Loading...";
     }
@@ -197,14 +196,14 @@ function updateFreeCompany(character) {
 function updateFreeCompanyRank(character) {
   /** Assume no rank */
   var FCRank = "";
-  
+
   /** If character is in a Free Company */
   if (character.Character.FreeCompanyId !== null) {
     if (character.FreeCompany !== null) {
-      
-  /** If character is in a free company, check the unsorted list for their spot, then get their rank. */
+
+      /** If character is in a free company, check the unsorted list for their spot, then get their rank. */
       for (var i = 0; i < character.FreeCompanyMembers.length; i++) {
-        
+
         if (character.FreeCompanyMembers[i].ID == character.Character.ID) {
           /** Found it. Update their rank */
           FCRank = character.FreeCompanyMembers[i].Rank

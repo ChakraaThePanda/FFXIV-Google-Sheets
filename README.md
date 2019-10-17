@@ -4,7 +4,7 @@ Chakraa Arcana @ Leviathan.
 Discord: Chakraa#1837
 
 **Contributor(s)**:  
-Raven Ambree @ Excalibur
+Raven Ambree @ Excalibur.  
 Discord: Onlyme#7038
 
 **Purpose**:  

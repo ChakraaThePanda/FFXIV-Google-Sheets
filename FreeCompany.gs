@@ -9,7 +9,7 @@ function runFCScript() {
     _RosterSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('FC Roster'),
         _AmountOfHeaders = 3,
         _RosterSheetFirstCharacterScannedRow = 4,
-        _FCRosterSheetAmountOfRows = _FCRosterSheet.getLastRow() - _FCAmountOfHeaders,
+        _RosterSheetAmountOfRows = _RosterSheet.getLastRow() - _AmountOfHeaders,
         _FCID = 0,
         _FCRow = 2,
         _FCAPIInfo = "",
@@ -27,7 +27,7 @@ function runFCScript() {
 
 function updateFreeCompany() {
     if (isAPIKeyValid()) {
-        _FCID = _FCRosterSheet.getRange(_FCRow, _CHIDColumn).getDisplayValue()
+        _FCID = _RosterSheet.getRange(_FCRow, _CHIDColumn).getDisplayValue()
 
         // (Free Company Addon)
         // If an FC Lodestone ID is not present, error out.
@@ -40,7 +40,6 @@ function updateFreeCompany() {
             // Update the FC info, then update the roster list with the IDs found
             getFCInfo();
             getFCIDs();
-
         }
     }
 }
@@ -49,37 +48,32 @@ function updateFreeCompany() {
 // fetch FC info from xivapi, if it exists. If it does, do work with it. If not, it isn't found.
 function getFCInfo() {
 
-    _FCID = _FCRosterSheet.getRange(_FCRow, _CHIDColumn).getDisplayValue();
+    _FCID = _RosterSheet.getRange(_FCRow, _CHIDColumn).getDisplayValue();
     _FCAPIInfo = JSON.parse(UrlFetchApp.fetch("https://xivapi.com/freecompany/" + _FCID + "?key=" + _APIKey + "&data=FCM").getContentText());
 
     if (_FCAPIInfo.hasOwnProperty('FreeCompany')) {
-
         updateFCHeader(_FCAPIInfo, _FCRow);
-
     } else {
-
-        _FCRosterSheet.getRange(FCRow, _FCNameColumn).setValue("Not Found");
-
+        _RosterSheet.getRange(FCRow, _FCNameColumn).setValue("Not Found");
     }
 }
 
-function updateFC(freecompany, row) {
+function updateFCHeader(freecompany, row) {
 
     // add FC Logo
-    _FCRosterSheet.getRange(row, _FCAvatarColumn).setValue("=IMAGE(\"https://xivapi.com/freecompany/" + freecompany.FreeCompany.ID + "/icon\",2)");
+    _RosterSheet.getRange(row, _FCAvatarColumn).setValue("=IMAGE(\"https://xivapi.com/freecompany/" + freecompany.FreeCompany.ID + "/icon\",2)");
 
     // add FC Name
-    _FCRosterSheet.getRange(row, _FCNameColumn).setValue("=HYPERLINK(\"https://na.finalfantasyxiv.com/lodestone/freecompany/" + freecompany.FreeCompany.ID.replace('i', '') + "\", \"" + freecompany.FreeCompany.Name + " «" + freecompany.FreeCompany.Tag + "» " + "\")");
+    _RosterSheet.getRange(row, _FCNameColumn).setValue("=HYPERLINK(\"https://na.finalfantasyxiv.com/lodestone/freecompany/" + freecompany.FreeCompany.ID.replace('i', '') + "\", \"" + freecompany.FreeCompany.Name + " «" + freecompany.FreeCompany.Tag + "» " + "\")");
 
     // add server FC is from
-    _FCRosterSheet.getRange(row, _FCServerColumn).setValue(freecompany.FreeCompany.Server + " (" + freecompany.FreeCompany.DC + ")");
+    _RosterSheet.getRange(row, _FCServerColumn).setValue(freecompany.FreeCompany.Server + " (" + freecompany.FreeCompany.DC + ")");
 
     // add Membership Count
-    _FCRosterSheet.getRange(row, _FCMemberCountColumn).setValue(freecompany.FreeCompanyMembers.length);
+    _RosterSheet.getRange(row, _FCMemberCountColumn).setValue(freecompany.FreeCompanyMembers.length);
 
     // add Ranking (Weekly/Monthly)
-    _FCRosterSheet.getRange(row, _FCServerRankColumn).setValue(freecompany.FreeCompany.Ranking.Weekly + " / " + freecompany.FreeCompany.Ranking.Monthly);
-
+    _RosterSheet.getRange(row, _FCServerRankColumn).setValue(freecompany.FreeCompany.Ranking.Weekly + " / " + freecompany.FreeCompany.Ranking.Monthly);
 }
 
 
@@ -89,37 +83,26 @@ function getFCIDs() {
 
     var sheetIDs = [],
         parsedIDs = [],
-        sorted2DIDs = [],
-        data = [];
+        sortedIDs = [];
 
     // for each member, put the ID in parsed IDs, and collect the rest of the info to be pasted later.
     for (var i = 0; i < _FCAPIInfo.FreeCompanyMembers.length; i++) {
 
         // parsed this ID
         parsedIDs[i] = _FCAPIInfo.FreeCompanyMembers[i].ID
-
-        var arr = [];
-
-        arr[0] = "=HYPERLINK(\"" + _FCAPIInfo.FreeCompanyMembers[i].Avatar + "\", IMAGE(\"" + _FCAPIInfo.FreeCompanyMembers[i].Avatar + "\"))";
-        arr[1] = "=HYPERLINK(\"https://na.finalfantasyxiv.com/lodestone/character/" + _FCAPIInfo.FreeCompanyMembers[i].ID + "\",\"" + _FCAPIInfo.FreeCompanyMembers[i].Name + "\")";
-        arr[2] = _FCAPIInfo.FreeCompanyMembers[i].ID
-        arr[3] = _FCAPIInfo.FreeCompanyMembers[i].Server
-        arr[4] = "=HYPERLINK(\"https://na.finalfantasyxiv.com/lodestone/freecompany/" + _FCAPIInfo.FreeCompany.ID.replace('i', '') + "\", \"" + _FCAPIInfo.FreeCompany.Name + " «" + _FCAPIInfo.FreeCompany.Tag + "» " + "\")";
-        arr[5] = _FCAPIInfo.FreeCompanyMembers[i].Rank
-
-        sorted2DIDs[i] = arr
+        sortedIDs[i] = _FCAPIInfo.FreeCompanyMembers[i].ID
     }
     // create a sorted list by arr ID
-    sorted2DIDs.sort(sortBy(2));
+    sortedIDs.sort(sortBy(0));
 
-    // pull all the data from the sheet at once. This puts it into a 2D array 6 across, and a number of rows down. 
-    if (_FCRosterSheetAmountOfRows > 0) {
+    // pull all the data from the sheet at once. This puts it into a 2D array 6 across, and a number of rows down.
+    if (_RosterSheetAmountOfRows > 0) {
         //Collect all character membership data we have.
-        var sheet2DIDs = _FCRosterSheet.getRange(_FCRosterSheetFirstCharacterScannedRow, _FCAvatarColumn, _FCRosterSheetAmountOfRows, 6).getDisplayValues()
+        var sheet2DIDs = _RosterSheet.getRange(_RosterSheetFirstCharacterScannedRow, _CHIDColumn, _RosterSheetAmountOfRows, 1).getDisplayValues()
 
         // check if there's an ID present in each row.
         for (i = 0; i < sheet2DIDs.length; i++) {
-            var id = parseInt(sheet2DIDs[i][2]);
+            var id = parseInt(sheet2DIDs[i][0]);
             sheetIDs[i] = id;
             if (isNaN(sheetIDs[i])) {
                 sheetIDs[i] = ""
@@ -133,42 +116,17 @@ function getFCIDs() {
     // smear newIDs into sheetIDs, filling in holes and adding to the end.
     sheetIDs = mergeArrays(newIDs, sheetIDs)
 
-    // sheetIDs now contains newly parsed IDs with order preserved.
-
-
-    // for each ID in sheetIDs
-    for (i = 0; i < sheetIDs.length; i++) {
-
-        id = parseInt(sheetIDs[i]);
-        row = indexOf(sorted2DIDs, id, 2, 0, sorted2DIDs.length - 1);
-
-        // if the ID is NOT found in the FC
-        if (row < 0) {
-            // blank it out
-            sheet2DIDs[i] = ["", sheet2DIDs[i][1], id, "", "", ""];
-        } else {
-            if (sheet2DIDs[i][0] == "") {
-                sheet2DIDs[i] = sorted2DIDs[row];
-            } else {
-                sheet2DIDs[i][1] = sorted2DIDs[row][1];
-                sheet2DIDs[i][2] = sorted2DIDs[row][2];
-                sheet2DIDs[i][3] = sorted2DIDs[row][3];
-                sheet2DIDs[i][4] = sorted2DIDs[row][4];
-                sheet2DIDs[i][5] = sorted2DIDs[row][5];
-            }
-
-        }
-    }
-
-    var leftRange = _FCRosterSheet.getRange(_FCRosterSheetFirstCharacterScannedRow, _FCAvatarColumn, sheet2DIDs.length, 6);
-    leftRange.setValues(sheet2DIDs);
+    // paste the IDs into the sheet
+    var data = sheetIDs.map(function (elem) { return [elem]; });
+    var leftRange = _RosterSheet.getRange(_RosterSheetFirstCharacterScannedRow, _CHIDColumn, data.length, 1);
+    leftRange.setValues(data);
 
     // update the roster with the new amount of rows.
-    _FCRosterSheetAmountOfRows = _FCRosterSheet.getLastRow()
+    _RosterSheetAmountOfRows = _RosterSheet.getLastRow()
 
     // add times and equations for all empty time and equation cells.
-    updateDates(_FCRosterSheetAmountOfRows - _FCAmountOfHeaders);
-    updateTimeEquations(_FCRosterSheetAmountOfRows - _FCAmountOfHeaders);
+    updateDates(_RosterSheetAmountOfRows - _AmountOfHeaders);
+    updateTimeEquations(_RosterSheetAmountOfRows - _AmountOfHeaders);
 }
 
 
@@ -178,7 +136,7 @@ function updateDates(numRows) {
 
     if (numRows == 0) { return }
     // data placed. Update when we saw them
-    var date2DArray = _FCRosterSheet.getRange(_FCRosterSheetFirstCharacterScannedRow, _CHFCJoinDate, numRows, 1).getDisplayValues();
+    var date2DArray = _RosterSheet.getRange(_RosterSheetFirstCharacterScannedRow, _CHListDate, numRows).getDisplayValues();
     var dateArray = new Array();
     var date = Utilities.formatDate(new Date(), "GMT-8", "MM/dd/yyyy")
 
@@ -190,7 +148,7 @@ function updateDates(numRows) {
 
     // prep for pasting onto the sheet
     var times = dateArray.map(function (elem) { return [elem]; });
-    range = _FCRosterSheet.getRange(_FCRosterSheetFirstCharacterScannedRow, _CHFCJoinDate, times.length, 1);
+    range = _RosterSheet.getRange(_RosterSheetFirstCharacterScannedRow, _CHListDate, times.length);
     range.setValues(times);
 
 }
@@ -200,7 +158,7 @@ function updateDates(numRows) {
 function updateTimeEquations(numRows) {
     if (numRows == 0) { return }
     // add time equations to all cells, in case they were missed previously.
-    var offset = (_CHFCJoinDate - _FCTimeEquation)
+    var offset = (_CHListDate - _CHTimeEquationColumn)
     var formulas = new Array()
 
     // generate formula column
@@ -210,7 +168,7 @@ function updateTimeEquations(numRows) {
 
     // paste it back into sheet
     var formulaMap = formulas.map(function (elem) { return [elem]; });
-    var range = _FCRosterSheet.getRange(_FCRosterSheetFirstCharacterScannedRow, _FCTimeEquation, formulaMap.length, 1);
+    var range = _RosterSheet.getRange(_RosterSheetFirstCharacterScannedRow, _CHTimeEquationColumn, formulaMap.length, 1);
     range.setFormulasR1C1(formulaMap);
 }
 

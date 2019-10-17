@@ -116,7 +116,7 @@ function updateCharacterInfos() {
 
  if(!pollingError){
 	var temparray;
-	var chunk = 4;
+	var chunk = 1;
     var options;
     var CHParse = [];
 	for(var i = 0; i < _CHID.length; i += chunk){

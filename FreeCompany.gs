@@ -4,21 +4,6 @@
 // * Get FC Lodestone to load membership IDs + stats info
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-var _FCRosterSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('FC Roster'),
-    _FCAmountOfHeaders = 3,
-    _FCRosterSheetFirstCharacterScannedRow = 4,
-    _FCRosterSheetAmountOfRows = _FCRosterSheet.getLastRow() - _FCAmountOfHeaders,
-    _FCID = 0,
-    _FCRow = 2,
-    _FCAPIInfo = "",
-    _FCStoredIDs = [],
-    _FCAvatarColumn = 1,
-    _FCNameColumn = 2,
-    _FCIDColumn = 3,
-    _FCServerColumn = 4,
-    _FCMemberCountColumn = 5,
-    _FCServerRankColumn = 6;
-
 function runFCScript() {
     // Name of sheet to update
     _RosterSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('FC Roster'),

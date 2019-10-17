@@ -117,25 +117,31 @@ function updateCharacterInfos() {
   if (!pollingError) {
     var options = [];
     var CHParse = [];
-    for (var i = 0; i < _CHID.length; ++i) {
-      options[i] = {
-        url: 'https://xivapi.com/characters',
-        muteHttpExceptions: true,
-        method: 'POST',
-        payload: JSON.stringify({
-          key: _APIKey,
-          ids: _CHID[i],
-          data: 'FC,FCM',
-          extended: 1
-        })
-      };
+    var request = [];
+    var count = 15;
+    for (var i = 0; i < _CHID.length; i += count) {
+      for (var j = 0; (j < count) && (i + j < _CHID.length); j++) {
+        options[j] = {
+          url: 'https://xivapi.com/characters',
+          muteHttpExceptions: true,
+          method: 'POST',
+          payload: JSON.stringify({
+            key: _APIKey,
+            ids: _CHID[i + j],
+            data: 'FC,FCM',
+            extended: 1
+          })
+        };
+      }
+      request = request.concat(UrlFetchApp.fetchAll(options));
+      options = [];
+      Utilities.sleep(2000);
     }
-    var request = UrlFetchApp.fetchAll(options);
-    request.forEach(function (element) {
-      CHParse = CHParse.concat(JSON.parse(element.getContentText()));
-    });
-    updateCharacter(CHParse);
   }
+  request.forEach(function (element) {
+    CHParse = CHParse.concat(JSON.parse(element.getContentText()));
+  });
+  updateCharacter(CHParse);
 }
 
 /** update character info with raw parsed info provided. */
@@ -152,8 +158,8 @@ function updateCharacter(CHParse) {
       CHLine[i][1] = "=HYPERLINK(\"https://na.finalfantasyxiv.com/lodestone/character/" + CHParse[i].Character.ID + "\", \"" + CHParse[i].Character.Name + "\")";
       CHLine[i][2] = CHParse[i].Character.ID;
       CHLine[i][3] = CHParse[i].Character.Server + " (" + CHParse[i].Character.DC + ")";
-      CHLine[i][4] = updateCHFreeCompany(CHParse[i]);
-      CHLine[i][5] = updateCHFreeCompanyRank(CHParse[i]);
+      CHLine[i][4] = updateFreeCompany(CHParse[i]);
+      CHLine[i][5] = updateFreeCompanyRank(CHParse[i]);
       CHLine[i][6] = updateCurrentClass(CHParse[i]);
       CHLine[i][7] = new Date(CHParse[i].Character.ParseDate * 1000);
       CHLine[i].splice.apply(CHLine[i], [7, 0].concat(updateClassJobsAndTime(CHParse[i])));
@@ -176,7 +182,7 @@ function updateCharacter(CHParse) {
       SpreadsheetApp.getUi().ButtonSet.OK);
 }
 
-function updateCHFreeCompany(character) {
+function updateFreeCompany(character) {
   /** Assume no FC */
   var FCName = "";
 
@@ -193,13 +199,13 @@ function updateCHFreeCompany(character) {
   return FCName;
 }
 
-function updateCHFreeCompanyRank(character) {
+function updateFreeCompanyRank(character) {
   /** Assume no rank */
   var FCRank = "";
 
   /** If character is in a Free Company */
   if (character.Character.FreeCompanyId !== null) {
-    if (character.FreeCompany !== null) {
+    if (character.FreeCompanyMembers !== null) {
 
       /** If character is in a free company, check the unsorted list for their spot, then get their rank. */
       for (var i = 0; i < character.FreeCompanyMembers.length; i++) {

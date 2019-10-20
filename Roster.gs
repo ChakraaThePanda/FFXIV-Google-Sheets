@@ -149,7 +149,7 @@ function updateCharacterInfos() {
       Utilities.sleep(2000);
     }
   }
-/** Format the requests so elements can be retrived via arrays */
+  /** Format the requests so elements can be retrived via arrays */
   request.forEach(function (element) {
     CHParse = CHParse.concat(JSON.parse(element.getContentText()));
   });
@@ -174,8 +174,8 @@ function updateCharacter(CHParse) {
       CHLine[i][1] = "=HYPERLINK(\"https://na.finalfantasyxiv.com/lodestone/character/" + CHParse[i].Character.ID + "\", \"" + CHParse[i].Character.Name + "\")";
       CHLine[i][2] = CHParse[i].Character.ID;
       CHLine[i][3] = CHParse[i].Character.Server + " (" + CHParse[i].Character.DC + ")";
-      CHLine[i][4] = updateFreeCompany(CHParse[i]);
-      CHLine[i][5] = updateFreeCompanyRank(CHParse[i]);
+      CHLine[i][4] = updateCHFreeCompany(CHParse[i]);
+      CHLine[i][5] = updateCHFreeCompanyRank(CHParse[i]);
       CHLine[i][6] = updateCurrentClass(CHParse[i]);
       CHLine[i][7] = new Date(CHParse[i].Character.ParseDate * 1000);
       CHLine[i].splice.apply(CHLine[i], [7, 0].concat(updateClassJobsAndTime(CHParse[i])));
@@ -201,7 +201,7 @@ function updateCharacter(CHParse) {
 /** Update a character's Free Company.
  * @param Character xivapi parsed data with FC mode
  */
-function updateFreeCompany(character) {
+function updateCHFreeCompany(character) {
   /** Assume no FC */
   var FCName = "";
 
@@ -222,7 +222,7 @@ function updateFreeCompany(character) {
  * Update a character's Free Company Rank
  * @param Character xivapi parsed data with FCM mode
  */
-function updateFreeCompanyRank(character) {
+function updateCHFreeCompanyRank(character) {
   /** Assume no rank */
   var FCRank = "";
 

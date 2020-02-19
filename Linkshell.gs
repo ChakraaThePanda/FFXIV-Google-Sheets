@@ -1,7 +1,8 @@
-/*
-
-The following IDs are tied to Linkshells
+/** Specific to Linkshell functions. */
 
 
+function runLSScript() {
 
-*/
+    updateLinkshell()
+    updateCurrentRoster();
+  }

@@ -50,6 +50,7 @@ function getFCInfo() {
 
     _FCID = _RosterSheet.getRange(_FCRow, _CHIDColumn).getDisplayValue();
     _FCAPIInfo = JSON.parse(UrlFetchApp.fetch("https://xivapi.com/freecompany/" + _FCID + "?key=" + _APIKey + "&data=FCM").getContentText());
+     Utilities.sleep(1000);
 
     if (_FCAPIInfo.hasOwnProperty('FreeCompany')) {
         updateFCHeader(_FCAPIInfo, _FCRow);

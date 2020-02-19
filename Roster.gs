@@ -138,7 +138,7 @@ function updateCharacterInfos() {
           payload: JSON.stringify({
             key: _APIKey,
             ids: _CHID[i + j],
-            data: 'FC,FCM',
+            data: 'FC,FCM,CJ',
             extended: 1
           })
         };
@@ -146,7 +146,7 @@ function updateCharacterInfos() {
       /** Sends out the requested amount of payloads. */
       request = request.concat(UrlFetchApp.fetchAll(options));
       options = [];
-      Utilities.sleep(2000);
+      Utilities.sleep(3000);
     }
   }
   /** Format the requests so elements can be retrived via arrays */

@@ -1,6 +1,6 @@
 # FFXIV Automatic Spreadsheet
 **Created by**:  
-Chakraa Arcana @ Leviathan.  
+Chakraa Arcana @ Famfrit.  
 Discord: Chakraa#1837
 
 **Contributor(s)**:  

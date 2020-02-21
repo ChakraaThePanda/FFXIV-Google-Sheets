@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // * FFXIV Automatic Spreadsheet
-// * Created by Chakraa Arcana @ Leviathan with contributions from Raven Ambree @ Excalibur
+// * Created by Chakraa Arcana @ Famfrit with contributions from Raven Ambree @ Excalibur
 // * Discord: Chakraa#1837 or Onlyme#7038 (respectively)
 // * Created on: Jan 25th 2019
 // * Purpose: Through the use of https://xivapi.com/, display information of the

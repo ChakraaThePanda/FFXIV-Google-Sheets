@@ -121,7 +121,7 @@ function updateCharacterInfos() {
     var request = [];
 
     /** Size of each payload segment. ie: retrieving count characters at a time from the API. */
-    var count = 15;
+    var count = 10;
 
     /** 
      * Outside loop: Number of chunks
@@ -136,7 +136,7 @@ function updateCharacterInfos() {
           muteHttpExceptions: true,
           method: 'POST',
           payload: JSON.stringify({
-            key: _APIKey,
+            private_key: _APIKey,
             ids: _CHID[i + j],
             data: 'FC,FCM,CJ',
             extended: 1
@@ -146,7 +146,7 @@ function updateCharacterInfos() {
       /** Sends out the requested amount of payloads. */
       request = request.concat(UrlFetchApp.fetchAll(options));
       options = [];
-      Utilities.sleep(3000);
+      Utilities.sleep(5000);
     }
   }
   /** Format the requests so elements can be retrived via arrays */

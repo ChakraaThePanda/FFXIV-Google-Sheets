@@ -1,25 +1,26 @@
 # FFXIV Automatic Spreadsheet
-**Created by**:  
+<ins>**Created by**</ins>:  
 Chakraa Arcana @ Famfrit.  
 Discord: Chakraa#0001
 
-**Contributor(s)**:  
+<ins>**Contributor(s)**</ins>:  
 Raven Ambree @ Excalibur.  
 Discord: Onlyme#7038
 
-**Purpose**:  
+<ins>**Purpose**</ins>:  
 Through the use of [XIVAPI](https://xivapi.com/), the goal is to display selected information of the
 selected characters through their LodestoneID in a Google Sheets Project.  
 The Sheets Project will be made available to copy by anyone and be used to manage their own team, FC, Linkshell, etc.
 
-**Where to Start/Update your Current Copy**:  
+<ins>**Where to Start/Update your Current Copy**</ins>:  
 You can copy the blank template located below, and add your informations after following the little tutorial.
 https://docs.google.com/spreadsheets/d/1ogSmumtF4Ml83k1ddc2UEGgGu-VkHlqK9jTftSdqYnk/  
 Unfortunately, there isn't a good and practical way to update your current copy of the Spreadsheet with the up-to-date informations.  
 If you want to have the latest version of the Spreadsheet, you will have to make a copy of the blank version listed just above and transfer your data over.
 
-**Latest Github Release**:  
-https://github.com/ChakraaThePanda/FFXIV-Google-Sheets/releases
+<ins>**Latest Github Release**</ins>:  
+https://github.com/ChakraaThePanda/FFXIV-Google-Sheets/releases  
+***Unless specified otherwise, even if the latest release doesn't reflect the current FFXIV Patch, it should still be working. It just means nothing breaking was added to the game since the last sheet update.***
 
 ## The Sheets
 

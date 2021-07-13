@@ -49,6 +49,8 @@ Updating this page using the Black button in the top-left will add every charact
 * I added my character in the list, but it seems to be outdated. How do I update it?
   * The spreadsheet will not update itself to have your character's info real time. The data we use on the sheet is taken directly on the Lodestone page of your character. If the Lodestone page is outdated, we also will be. Lodestone can take a couple hours to have all the correct informations
 * I entered my character's LodestoneID and it cannot find my character.
-  * If your character is brand new, it may take a little while for it to appear in the Lodestone database. Retry a bit later :)
+  * If your character is brand new, it may take a little while for it to appear in the Lodestone database. Retry a bit later :smile:
 * I have found an issue with the page/something doesn't seem to work.
-  * Add me on Discord: Chakraa#0001. I'll be happy to assist you ;)
+  * Add me on Discord: Chakraa#0001. I'll be happy to assist you :wink:
+* Do you have a donation link at all?
+  * Nah, no worries, its about the only little side project I have that im keeping up to date, so it doesnt take much of my time. I do it just for fun :smile:

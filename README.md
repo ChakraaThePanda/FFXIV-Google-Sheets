@@ -12,6 +12,10 @@ Through the use of [XIVAPI](https://xivapi.com/), the goal is to display selecte
 selected characters through their LodestoneID in a Google Sheets Project.  
 The Sheets Project will be made available to copy by anyone and be used to manage their own team, FC, Linkshell, etc.
 
+<ins>**Limitations**</ins>: 
+Due to how the API works and Google's limitation on Spreadsheet scripts, the FC portion of the sheet will not work for FCs with a high member count, past i'd say roughly 280 members.
+You can still track people individually in the regular Roster sheet, perfect for your favorite FC members!
+
 <ins>**Where to Start/Update your Current Copy**</ins>:  
 You can copy the blank template located below, and add your informations after following the little tutorial.
 https://docs.google.com/spreadsheets/d/1ogSmumtF4Ml83k1ddc2UEGgGu-VkHlqK9jTftSdqYnk/  
@@ -46,6 +50,8 @@ Updating this page using the Black button in the top-left will add every charact
 ## Quick FAQ
 * If I have a question, where should I ask it?
   * If you have any questions, I would suggest adding me on Discord: Chakraa#0001
+* The FC Sheet only pulls the IDs but doesnt show the information on my members, why?
+  * Most likely your FC is too big for us to handle. The sheet works for FCs that have an amount of members ranging from 1 to more or less 280.
 * I added my character in the list, but it seems to be outdated. How do I update it?
   * The spreadsheet will not update itself to have your character's info real time. The data we use on the sheet is taken directly on the Lodestone page of your character. If the Lodestone page is outdated, we also will be. Lodestone can take a couple hours to have all the correct informations
 * I entered my character's LodestoneID and it cannot find my character.

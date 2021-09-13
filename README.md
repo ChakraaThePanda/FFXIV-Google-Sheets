@@ -12,7 +12,7 @@ Through the use of [XIVAPI](https://xivapi.com/), the goal is to display selecte
 selected characters through their LodestoneID in a Google Sheets Project.  
 The Sheets Project will be made available to copy by anyone and be used to manage their own team, FC, Linkshell, etc.
 
-<ins>**Limitations**</ins>: 
+<ins>**Limitations**</ins>:  
 Due to how the API works and Google's limitation on Spreadsheet scripts, the FC portion of the sheet will not work for FCs with a high member count, past i'd say roughly 280 members.
 You can still track people individually in the regular Roster sheet, perfect for your favorite FC members!
 

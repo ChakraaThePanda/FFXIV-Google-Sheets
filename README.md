@@ -13,7 +13,7 @@ Discord: Chakraa#0001
 
 <ins>**Contributor(s)**</ins>:  
 Raven Ambree @ Excalibur.  
-Discord: Onlyme#7038
+Discord: RavenAmbree#7038
 
 <ins>**Purpose**</ins>:  
 Through the use of [XIVAPI](https://xivapi.com/), the goal is to display selected information of the
@@ -65,6 +65,6 @@ Updating this page using the Black button in the top-left will add every charact
 * I entered my character's LodestoneID and it cannot find my character.
   * If your character is brand new, it may take a little while for it to appear in the Lodestone database. Retry a bit later :smile:
 * I have found an issue with the page/something doesn't seem to work.
-  * Add Raven on Discord: Onlyme#7038. He will be happy to assist you :wink:
+  * Add Raven on Discord: RavenAmbree#7038. He will be happy to assist you :wink:
 * Do you have a donation link at all?
   * Nah, no worries, its about the only little side project I have that im keeping up to date, so it doesnt take much of my time. I do it just for fun :smile:

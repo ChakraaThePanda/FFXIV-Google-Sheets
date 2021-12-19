@@ -1,7 +1,7 @@
 # FFXIV Automatic Spreadsheet
 
-### A Message from Chakraa:  
-### This project is no longer maintained as I have taken most likely definite break from FFXIV as I move to different games.  
+### ⚠️ This project is no longer maintained ⚠️  
+### I, Chakraa, have taken a most likely definite break from FFXIV and am moving on to different games.  
 ### You can fork this project if you want to work on it yourself, or contact Raven (Discord: Onlyme#7038) for support.  
 
 <ins>**Created by**</ins>:  

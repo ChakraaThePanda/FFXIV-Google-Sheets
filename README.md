@@ -2,7 +2,7 @@
 
 ### ⚠️ This project is no longer maintained ⚠️  
 I am taking a most likely definite break from FFXIV and am moving on to different games.  
-You can fork this project if you want to work on it yourself, or contact Raven (Discord: Onlyme#7038) for support.  
+You can fork this project if you want to work on it yourself, or contact Raven (Discord: RavenAmbree#7038) for support.  
 Good luck to all my fellow Warriors of Light!  
 
 ---
@@ -57,7 +57,7 @@ Updating this page using the Black button in the top-left will add every charact
 
 ## Quick FAQ
 * If I have a question, where should I ask it?
-  * If you have any questions, I would suggest contacting Raven on Discord: Onlyme#7038
+  * If you have any questions, I would suggest contacting Raven on Discord: RavenAmbree#7038
 * The FC Sheet only pulls the IDs but doesnt show the information on my members, why?
   * Most likely your FC is too big for us to handle. The sheet works for FCs that have an amount of members ranging from 1 to more or less 280.
 * I added my character in the list, but it seems to be outdated. How do I update it?

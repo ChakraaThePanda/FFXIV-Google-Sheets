@@ -1,4 +1,9 @@
 # FFXIV Automatic Spreadsheet
+
+### A Message from Chakraa:  
+### This project is no longer maintained as I have taken most likely definite break from FFXIV as I move to different games.  
+### You can fork this project if you want to work on it yourself, or contact Raven (Discord: Onlyme#7038) for support.  
+
 <ins>**Created by**</ins>:  
 Chakraa Arcana @ Famfrit.  
 Discord: Chakraa#0001
@@ -49,7 +54,7 @@ Updating this page using the Black button in the top-left will add every charact
 
 ## Quick FAQ
 * If I have a question, where should I ask it?
-  * If you have any questions, I would suggest adding me on Discord: Chakraa#0001
+  * If you have any questions, I would suggest contacting Raven on Discord: Onlyme#7038
 * The FC Sheet only pulls the IDs but doesnt show the information on my members, why?
   * Most likely your FC is too big for us to handle. The sheet works for FCs that have an amount of members ranging from 1 to more or less 280.
 * I added my character in the list, but it seems to be outdated. How do I update it?
@@ -57,6 +62,6 @@ Updating this page using the Black button in the top-left will add every charact
 * I entered my character's LodestoneID and it cannot find my character.
   * If your character is brand new, it may take a little while for it to appear in the Lodestone database. Retry a bit later :smile:
 * I have found an issue with the page/something doesn't seem to work.
-  * Add me on Discord: Chakraa#0001. I'll be happy to assist you :wink:
+  * Add Raven on Discord: Onlyme#7038. He will be happy to assist you :wink:
 * Do you have a donation link at all?
   * Nah, no worries, its about the only little side project I have that im keeping up to date, so it doesnt take much of my time. I do it just for fun :smile:

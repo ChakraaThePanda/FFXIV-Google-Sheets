@@ -1,8 +1,9 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
-// * FFXIV Automatic Spreadsheet
+// * FFXIV Automatic Spreadsheet - For the Endwalker expansion!
 // * Created by Chakraa Arcana @ Famfrit with contributions from Raven Ambree @ Excalibur
-// * Discord: Chakraa#0001 or Onlyme#7038 (respectively)
+// * Discord: Chakraa#0001 or RavenAmbree#7038 (respectively)
 // * Created on: Jan 25th 2019
+// * Last Updated: Dec 27, 2021
 // * Purpose: Through the use of https://xivapi.com/, display information of the
 // * selected characters through their LodestoneID.
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,19 +41,19 @@ var _InstructionsSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('I
   /** Character global values */
   _CHID = [],
   _CHIDColumn = 3,
-  _CHLastUpdatedColumn = 37,
+  _CHLastUpdatedColumn = 39,
 
   ////////////////TO DO//////////////////
   _CHLastUpdated = [],
-  _CHTimeEquationColumn = 38,
-  _CHListDate = 39,
+  _CHTimeEquationColumn = 40,
+  _CHListDate = 41,
   ///////////////////////////////////////
 
   /**
    * The order is a bit weird, but the API is done like that.
    * In the desired order (Tank, Heal, DPS, DoH, DoL). The IDs of the classes.
    */
-  _ClassOrder = [19, 21, 32, 37, 24, 28, 33, 20, 22, 30, 34, 23, 31, 38, 25, 27, 35, 36, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
+  _ClassOrder = [19, 21, 32, 37, 24, 28, 33, 40, 20, 22, 30, 34, 39, 23, 31, 38, 25, 27, 35, 36, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
   _APIKey = "",
   _AlarmWrongilvl = false;
 
@@ -274,7 +275,7 @@ function updateCurrentClass(character) {
   if (gear[keys[mainHandIndex]].Item !== null)
     ilvl += (offhand ? gear[keys[mainHandIndex]].Item.LevelItem : gear[keys[mainHandIndex]].Item.LevelItem * 2);
 
-  var ilvlstring = '\n' + Math.floor(ilvl / 13) + " ilvl"; //Build the string to display with the average ilvl rounded to 2 decimal places. 13 is the number of gear slots.
+  var ilvlstring = '\n' + Math.floor(ilvl / 12) + " ilvl"; //Build the string to display with the average ilvl rounded to 2 decimal places. 12 is the number of gear slots.
   var abbreviation = (soulcrystal ? character.Character.GearSet.Job.Abbreviation : character.Character.GearSet.Class.Abbreviation);
   return abbreviation + ilvlstring;
 }

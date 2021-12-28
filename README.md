@@ -26,7 +26,7 @@ You can still track people individually in the regular Roster sheet, perfect for
 
 <ins>**Where to Start/Update your Current Copy**</ins>:  
 You can copy the blank template located below, and add your informations after following the little tutorial.
-https://docs.google.com/spreadsheets/d/1ogSmumtF4Ml83k1ddc2UEGgGu-VkHlqK9jTftSdqYnk/  
+https://docs.google.com/spreadsheets/d/1c9wFqLBBDqp7QmtggCNuAqxAMyNzWQSCzVTHmz8lwj0/
 Unfortunately, there isn't a good and practical way to update your current copy of the Spreadsheet with the up-to-date informations.  
 If you want to have the latest version of the Spreadsheet, you will have to make a copy of the blank version listed just above and transfer your data over.
 

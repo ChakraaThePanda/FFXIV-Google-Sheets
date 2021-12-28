@@ -1,7 +1,7 @@
 # FFXIV Automatic Spreadsheet
 
 ### ⚠️ This project is no longer maintained ⚠️  
-I am taking a most likely definite break from FFXIV and am moving on to different games.  
+I (Chakraa) am taking a most likely definite break from FFXIV and am moving on to different games.  
 You can fork this project if you want to work on it yourself, or contact Raven (Discord: RavenAmbree#7038) for support.  
 Good luck to all my fellow Warriors of Light!  
 
@@ -11,7 +11,7 @@ Good luck to all my fellow Warriors of Light!
 Chakraa Arcana @ Famfrit.  
 Discord: Chakraa#0001
 
-<ins>**Contributor(s)**</ins>:  
+<ins>**Maintainer(s)**</ins>:  
 Raven Ambree @ Excalibur.  
 Discord: RavenAmbree#7038
 

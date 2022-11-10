@@ -122,7 +122,7 @@ function updateCharacterInfos() {
     var request = [];
 
     /** Size of each payload segment. ie: retrieving count characters at a time from the API. */
-    var count = 10;
+    var count = 4;
 
     /** 
      * Outside loop: Number of chunks

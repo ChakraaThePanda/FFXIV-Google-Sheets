@@ -1,12 +1,15 @@
 # FFXIV Automatic Spreadsheet
 
-### ⚠️ This project is no longer maintained ⚠️  
+### ⚠️ This project is Abandoned / No longer Maintained ⚠️  
 I (Chakraa) am taking a most likely definite break from FFXIV and am moving on to different games.  
 You can fork this project if you want to work on it yourself, or contact Raven (Discord: @RavenAmbree) for support.
 Good luck to all my fellow Warriors of Light!  
 
 Update Nov 13, 2024: I, Raven, am formally renouncing support for this project. This project heavily relied on an XIVAPI feature which is no longer available.
 I suggest you find another way to parse the lodestone for the necessary information.
+
+
+Do with it what you will.
 
 ---
 

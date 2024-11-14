@@ -17,9 +17,9 @@ Do with it what you will.
 Chakraa Arcana @ Famfrit.  
 Discord: Chakraa#0001
 
-<ins>**Maintainer(s)**</ins>:  
+<ins>**Assisted By**</ins>:  
 Raven Ambree @ Excalibur.  
-Discord: RavenAmbree#7038
+Discord: @RavenAmbree
 
 <ins>**Purpose**</ins>:  
 Through the use of [XIVAPI](https://xivapi.com/), the goal is to display selected information of the
